@@ -1,0 +1,17 @@
+2039696811,Dummy Venue,Ames,0
+1196719336,Hilton,Ames,10
+1681619642,Dummy Venue,Desmoines,0
+326018095,RandomPlace,Des Moines,22
+2039696811,Dummy Venue,Ames,0
+1971117365,Dummy Venue,Chicago,0
+1196719336,Hilton,Ames,10
+1681619642,Dummy Venue,Desmoines,0
+326018095,RandomPlace,Des Moines,22
+2039696811,Dummy Venue,Ames,0
+1971117365,Dummy Venue,Chicago,0
+1196719336,Hilton,Ames,10
+1681619642,Dummy Venue,Desmoines,0
+326018095,RandomPlace,Des Moines,22
+2039696811,Dummy Venue,Ames,0
+1971117365,Dummy Venue,Chicago,0
+1196719336,Hilton,Ames,10

@@ -1,0 +1,3 @@
+interface Actor {
+    void showOptions();
+}

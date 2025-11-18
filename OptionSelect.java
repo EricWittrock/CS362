@@ -1,0 +1,3 @@
+interface OptionSelect{
+    void select();
+}
