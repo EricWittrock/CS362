@@ -3,7 +3,7 @@ import java.util.stream.Collectors;
 
 public class Stakeholder implements Actor {
     private String name;
-    private String role; // Creative Director, Safety Officer, etc.
+    private String role; // Creative Director, Safety Officer, etc
 
     public Stakeholder() {
         System.out.println("Enter your name:");

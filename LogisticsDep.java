@@ -1,7 +1,7 @@
 import java.util.List;
 
 class LogisticsDep implements Actor {
-    private int budget = 100000;
+    private int budget = 1000000;
 
     LogisticsDep() {
         
@@ -92,5 +92,13 @@ class LogisticsDep implements Actor {
         int newBudget = UserInput.getIntInput(0, Integer.MAX_VALUE);
         budget = newBudget;
         System.out.println("Budget set to " + budget);
+    }
+
+    private void OrganizeTransportation() {
+
+    }
+
+    private void OrganizeLogging() {
+
     }
 }

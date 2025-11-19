@@ -14,9 +14,10 @@ public class Main {
         System.out.println("0) Exit Program");
         System.out.println("1) Customer");
         System.out.println("2) Logistics Department");
-        System.out.println("3) Choreographer");
-        System.out.println("4) Manager");
-        System.out.println("5) Streaming Company");
+        System.out.println("3) Consumer Logistics Department");
+        System.out.println("4) Choreographer");
+        System.out.println("5) Manager");
+        System.out.println("6) Streaming Company");
         int response = UserInput.getIntInput(0, 5);
 
         Actor actor;
@@ -30,12 +31,15 @@ public class Main {
                 actor = new LogisticsDep();
                 break;
             case 3:
-                actor = new Choreographer();
+                actor = new ConsumerLogistics();
                 break;
             case 4:
-                actor = new Manager();
+                actor = new Choreographer();
                 break;
             case 5:
+                actor = new Manager();
+                break;
+            case 6:
                 actor = new StreamingCompanyController();
                 break;
             default:

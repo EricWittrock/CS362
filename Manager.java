@@ -17,8 +17,9 @@ class Manager implements Actor {
             System.out.println("2) View All Wrestlers");
             System.out.println("3) Schedule Wrestler for Event");
             System.out.println("4) View Event Schedule");
+            System.out.println("5) Add Wresler Insurance");
             System.out.print("Enter choice: ");
-            int choice = UserInput.getIntInput(0, 4);
+            int choice = UserInput.getIntInput(0, 5);
 
             if (choice == 0) {
                 break;
@@ -30,6 +31,8 @@ class Manager implements Actor {
                 scheduleWrestler();
             } else if (choice == 4) {
                 viewEventSchedule();
+            } else if (choice == 5) {
+                addWrestlerInsurance();
             }
         }
     }
@@ -147,5 +150,67 @@ class Manager implements Actor {
         if (!found) {
             System.out.println("  No wrestlers scheduled for this event.");
         }
+    }
+
+    private void addWrestlerInsurance() {
+        System.out.println("\n--- Add Wrestler Insurance ---");
+
+        List<Wrestler> wrestlers = DataCache.getAllWrestlers();
+        if (wrestlers.isEmpty()) {
+            System.out.println("No wrestlers in system.");
+            return;
+        }
+
+        System.out.println("\nWrestlers:");
+        for (int i = 0; i < wrestlers.size(); i++) {
+            Wrestler w = wrestlers.get(i);
+            WrestlerInsurance existing = DataCache.getInsuranceByWrestlerId(w.getId());
+            String status = (existing != null && !existing.isExpired()) ? " Insured" : "No Insurance";
+            System.out.println((i + 1) + ". " + w.getName() + " - " + status);
+        }
+
+        System.out.println("\nSelect wrestler (1-" + wrestlers.size() + ", 0 to cancel): ");
+        int choice = UserInput.getIntInput(0, wrestlers.size());
+
+        if (choice == 0) { return; }
+
+        Wrestler wrestler = wrestlers.get(choice - 1);
+
+        // Check existing insurance
+        WrestlerInsurance existing = DataCache.getInsuranceByWrestlerId(wrestler.getId());
+        if (existing != null && !existing.isExpired()) {
+            System.out.println("Error: Wrestler already has active insurance.");
+            System.out.println("    Coverage: $" + existing.getCoverageAmount());
+            System.out.println("    Max Danger: " + existing.getMaxDangerRating());
+            System.out.println("    Expires on: " + new Date(existing.getExpirationDate()));
+            return;
+        }
+
+        System.out.println("\n--- Insurance Policy Setup ---");
+        System.out.print("Maximum danger rating to cover (1-10): ");
+        int maxDanger = UserInput.getIntInput(1, 10);
+        
+        // Calculate coverage amount and expiration date
+        double coverageAmount = maxDanger * 10000.0;  // Higher danger = more coverage
+        long oneYear = 365L * 24 * 60 * 60 * 1000;
+        long expirationDate = System.currentTimeMillis() + oneYear;
+
+        // cover all action types by default
+        List<ActionType> coveredTypes = new ArrayList<>(Arrays.asList(ActionType.values()));
+
+        new WrestlerInsurance (
+            wrestler.getId(), 
+            coverageAmount, 
+            expirationDate, 
+            maxDanger, 
+            coveredTypes
+        );
+
+        System.out.println("\nInsurance policy created successfully!");
+        System.out.println("  Wrestler: " + wrestler.getName());
+        System.out.println("  Coverage Amount: $" + String.format("%.2f", coverageAmount));
+        System.out.println("  Max Danger Rating: " + maxDanger + "/10");
+        System.out.println("  Valid for: 1 year");
+        System.out.println("  Covers: All action types");
     }
 }
