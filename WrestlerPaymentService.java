@@ -2,15 +2,19 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class WrestlerPaymentService {
-    
+
     public void payWrestlersForEvent() {
+        payWrestlersForEventWithReturn();
+    }
+
+    public FinanceManager.WrestlerPaymentResult payWrestlersForEventWithReturn() {
         System.out.println("\n=== Pay Wrestlers for Event ===");
 
         List<Event> completedEvents = getCompletedEventsWithUnpaidWrestlers();
 
         if (completedEvents.isEmpty()) {
             System.out.println("\nNo completed events with unpaid wrestlers.");
-            return;
+            return new FinanceManager.WrestlerPaymentResult(0, 0);
         }
 
         displayEventList(completedEvents);
@@ -18,10 +22,11 @@ public class WrestlerPaymentService {
         System.out.print("\nSelect event (1-" + completedEvents.size() + ", 0 to cancel): ");
         int choice = UserInput.getIntInput(0, completedEvents.size());
 
-        if (choice == 0) return;
+        if (choice == 0)
+            return new FinanceManager.WrestlerPaymentResult(0, 0);
 
         Event selectedEvent = completedEvents.get(choice - 1);
-        processEventPayments(selectedEvent);
+        return processEventPaymentsWithReturn(selectedEvent);
     }
 
     private void displayEventList(List<Event> events) {
@@ -35,18 +40,22 @@ public class WrestlerPaymentService {
     }
 
     private void processEventPayments(Event event) {
+        processEventPaymentsWithReturn(event);
+    }
+
+    private FinanceManager.WrestlerPaymentResult processEventPaymentsWithReturn(Event event) {
         System.out.println("\n--- Processing Payments for Event: " + event.getDate() + " ---");
 
         List<WrestlerSchedule> schedules = getSchedulesForEvent(event.getId());
         if (schedules.isEmpty()) {
             System.out.println("\nNo wrestlers scheduled for this event.");
-            return;
+            return new FinanceManager.WrestlerPaymentResult(0, 0);
         }
 
         Script script = getApprovedScript(event.getId());
         if (script == null) {
             System.out.println("\nError: No approved script found for this event.");
-            return;
+            return new FinanceManager.WrestlerPaymentResult(0, 0);
         }
 
         WrestlerPaymentBatch batch = calculatePayments(schedules, script, event.getId());
@@ -59,17 +68,20 @@ public class WrestlerPaymentService {
 
         if (batch.payments.isEmpty()) {
             System.out.println("\nNo wrestlers can be paid at this time.");
-            return;
+            return new FinanceManager.WrestlerPaymentResult(0, 0);
         }
 
         if (confirmPayment()) {
             savePayments(batch.payments, event.getId());
             displaySuccess(batch);
+            return new FinanceManager.WrestlerPaymentResult(batch.totalCost, batch.payments.size());
         }
+
+        return new FinanceManager.WrestlerPaymentResult(0, 0);
     }
 
-    private WrestlerPaymentBatch calculatePayments(List<WrestlerSchedule> schedules, 
-                                                   Script script, int eventId) {
+    private WrestlerPaymentBatch calculatePayments(List<WrestlerSchedule> schedules,
+            Script script, int eventId) {
         WrestlerPaymentBatch batch = new WrestlerPaymentBatch();
 
         for (WrestlerSchedule schedule : schedules) {
@@ -103,33 +115,31 @@ public class WrestlerPaymentService {
     private String validateWrestler(Wrestler wrestler, Script script) {
         // Validate contract
         Contract contract = DataCache.getByFilter(
-            c -> c.getWrestlerId() == wrestler.getId(), 
-            Contract::new
-        );
+                c -> c.getWrestlerId() == wrestler.getId(),
+                Contract::new);
         if (contract == null || !contract.isActive() || contract.isExpired()) {
             return wrestler.getName() + ": No active contract";
         }
 
         // Validate insurance
         WrestlerInsurance insurance = DataCache.getByFilter(
-            i -> i.getWrestlerId() == wrestler.getId(),
-            WrestlerInsurance::new
-        );
+                i -> i.getWrestlerId() == wrestler.getId(),
+                WrestlerInsurance::new);
         if (insurance == null) {
             return wrestler.getName() + ": No insurance";
         }
 
         if (insurance.isExpired()) {
-            return wrestler.getName() + ": Insurance expired on " + 
-                   new Date(insurance.getExpirationDate());
+            return wrestler.getName() + ": Insurance expired on " +
+                    new Date(insurance.getExpirationDate());
         }
 
         // Check insurance coverage
         List<ScriptAction> wrestlerActions = getWrestlerActionsInScript(wrestler.getId(), script);
         for (ScriptAction action : wrestlerActions) {
             if (!insurance.coversAction(action)) {
-                return wrestler.getName() + ": Insurance doesn't cover " + 
-                       action.getActionType() + " (danger: " + action.getDangerRating() + ")";
+                return wrestler.getName() + ": Insurance doesn't cover " +
+                        action.getActionType() + " (danger: " + action.getDangerRating() + ")";
             }
         }
 
@@ -138,9 +148,8 @@ public class WrestlerPaymentService {
 
     private WrestlerPaymentInfo calculateWrestlerPayment(Wrestler wrestler, Script script) {
         Contract contract = DataCache.getByFilter(
-            i -> i.getWrestlerId() == wrestler.getId(),
-            Contract::new
-        );
+                i -> i.getWrestlerId() == wrestler.getId(),
+                Contract::new);
         List<ScriptAction> actions = getWrestlerActionsInScript(wrestler.getId(), script);
 
         int basePay = contract.getBasePay();
@@ -148,8 +157,8 @@ public class WrestlerPaymentService {
         int highRiskCount = PaymentCalculator.countHighRiskActions(actions);
         int totalPay = basePay + bonusAmount;
 
-        return new WrestlerPaymentInfo(wrestler, basePay, bonusAmount, 
-                                      totalPay, highRiskCount, actions.size());
+        return new WrestlerPaymentInfo(wrestler, basePay, bonusAmount,
+                totalPay, highRiskCount, actions.size());
     }
 
     private void displayPaymentBreakdown(WrestlerPaymentBatch batch) {

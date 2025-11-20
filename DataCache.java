@@ -11,14 +11,12 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.function.Predicate;
 
-
 class DataCache {
     private static Database db = new Database();
 
     // maps table name/class name to (id -> serialized line) map
     private static HashMap<String, HashMap<Integer, String>> DBCache = new HashMap<>();
     private static HashMap<Integer, DatabaseObject> changedObjects = new HashMap<>();
-
 
     public static <T extends DatabaseObject> T getById(int id, Supplier<T> factory) {
         T obj = factory.get();
@@ -31,23 +29,23 @@ class DataCache {
 
     public static <T extends DatabaseObject> T getByFilter(Predicate<T> filter, Supplier<T> factory) {
         T obj = getAll(factory).stream()
-            .filter(filter)
-            .findFirst()
-            .orElse(null);
+                .filter(filter)
+                .findFirst()
+                .orElse(null);
         return obj;
     }
 
     public static <T extends DatabaseObject> List<T> getAllByFilter(Predicate<T> filter, Supplier<T> factory) {
         List<T> list = getAll(factory).stream()
-            .filter(filter)
-            .collect(Collectors.toList());
+                .filter(filter)
+                .collect(Collectors.toList());
         return list;
     }
 
     private static int populateDBObject(DatabaseObject obj, int id) {
         String className = obj.getClass().getSimpleName().split("\\$")[0];
 
-        if ( getTablePath(className) == null ) {
+        if (getTablePath(className) == null) {
             System.out.println("Invalid class name: " + className);
             return 1;
         }
@@ -67,7 +65,7 @@ class DataCache {
             loadAllDBStrings(className);
         }
 
-        if(!map.containsKey(id)) {
+        if (!map.containsKey(id)) {
             System.out.println("ID " + id + " not found in " + className + " table.");
             return 1; // not found
         }
@@ -75,7 +73,7 @@ class DataCache {
         String dbLine = map.get(id);
         obj.deserialize(dbLine);
         changedObjects.put(id, obj);
-        return 0;        
+        return 0;
     }
 
     public static void addObject(DatabaseObject obj) {
@@ -117,13 +115,15 @@ class DataCache {
         HashMap<Integer, String> map = DBCache.get(className);
         for (String line : map.values()) {
             T obj = factory.get();
-            if (obj == null || line.strip().isEmpty()) continue;
+            if (obj == null || line.strip().isEmpty())
+                continue;
             obj.deserialize(line);
-            if (obj == null ) continue;
+            if (obj == null)
+                continue;
             objects.add(obj);
             changedObjects.put(obj.getId(), obj);
         }
- 
+
         return objects;
     }
 
@@ -177,7 +177,14 @@ class DataCache {
             case "Advertisement": return "./Data/Advertisement.txt";
             case "MediaContract": return "./Data/MediaContract.txt";
             case "TravelPlan": return "./Data/TravelPlans.txt";
+            case "Worker": return "./Data/Workers.txt";
+            case "WorkerAssignment": return "./Data/WorkerAssignments.txt";
+            case "WrestlerPayment": return "./Data/WrestlerPayments.txt";
+            case "WorkerPayment": return "./Data/WorkerPayments.txt";
+            case "ScriptInsurancePayment": return "./Data/ScriptInsurancePayments.txt";
+            case "Contract": return "./Data/Contracts.txt";
             default: return null;
+
         }
     }
 }
