@@ -44,7 +44,7 @@ public class StreamingCompany implements DatabaseObject {
 
 	@Override
 	public String serialize() {
-        return companyId + ", " + companyName;
+        return companyId + "," + companyName;
 	}
 
 	@Override

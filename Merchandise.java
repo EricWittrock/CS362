@@ -1,6 +1,8 @@
+import java.util.Random;
+
 public class Merchandise implements DatabaseObject
 {
-    private int id = 0;
+    private int id;
     private String name;
     private MerchType type;
     private int unitPrice;
@@ -10,7 +12,7 @@ public class Merchandise implements DatabaseObject
     
     public Merchandise(String name, MerchType type, int unitPrice)
     {
-        id++;
+        id = new Random().nextInt(Integer.MAX_VALUE);
         this.name = name;
         this.type = type;
         this.unitPrice = unitPrice;
