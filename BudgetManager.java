@@ -26,13 +26,13 @@ public class BudgetManager implements Actor {
         options.loopDisplayAndSelect("Select a Budget to View:");
     }
 
-    private void allocatateFunds(Budget from, Budget to, int amount) {
-        if(from.funds() >= amount) {
-            from.charge(amount);
-            to.fund(amount);
+    private void allocatateFunds(int amount) {
+        if(payer.funds() >= amount) {
+            payer.charge(amount);
+            payee.fund(amount);
             System.out.println("Allocated $" + amount + " from " + payer.getName() + " to " + payee.getName());
         } else {
-            System.out.println("Insufficient funds. Only " + from.funds() + " in " + payer + " budget.");
+            System.out.println("Insufficient funds. Only " + payer.funds() + " in " + payer.getName() + " budget.");
         }
     }
 
@@ -81,7 +81,7 @@ public class BudgetManager implements Actor {
         if(amount == 0) {
             return;
         }
-        allocatateFunds(payer, payee, amount);
+        allocatateFunds(amount);
     }
 
     @Override

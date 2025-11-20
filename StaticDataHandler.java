@@ -65,14 +65,14 @@ public class StaticDataHandler {
         return results;
     }
 
-    private static double getSimilarity(String s1, String s2) {
+    public static double getSimilarity(String s1, String s2) {
         int maxLen = Math.max(s1.length(), s2.length());
         double[] kernel1 = new double[maxLen];
         double[] kernel2 = new double[maxLen];
 
         for (int i = 0; i < maxLen; i++) {
-            kernel1[i] = ((double) i / maxLen) * 0.5 + 0.5;
-            kernel2[i] = 1.0 - ((double) i / maxLen) * 0.5;
+            kernel1[i] = ((double) i / maxLen) * 0.2 + 0.8;
+            kernel2[i] = 1.0 - ((double) i / maxLen) * 0.2;
         }
 
         double cos1 = cosSimilarity(s1, s2, kernel1);
@@ -112,7 +112,9 @@ public class StaticDataHandler {
             while ((line = br.readLine()) != null) {
                 if (line.trim().isEmpty()) continue; // skip empty lines
                 City city = parseCity(line);
-                cities.add(city);
+                if (city != null) {
+                    cities.add(city);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -121,6 +123,9 @@ public class StaticDataHandler {
 
     private static City parseCity(String line) {
         String[] parts = line.split(",");
+        if (parts.length != 6) {
+            return null;
+        }
         String name = parts[0].trim();
         String country = parts[1].trim();
         double lat = Double.parseDouble(parts[2].trim());

@@ -677,7 +677,6 @@ Alexandria, United States, 38.8185, -77.0861, 156788, 1840003837
 Macon, United States, 32.8065, -83.6974, 156543, 1840043455
 Lakewood, United States, 39.6977, -105.1172, 156309, 1840020198
 Springfield, United States, 39.7709, -89.6540, 156240, 1840009517
-Kansas City, United States, 39.1235, -94.7443, 154776, 1840001626
 Burlington, United States, 36.0760, -79.4685, 154504, 1840013362
 Warner Robins, United States, 32.5961, -83.6527, 154327, 1840015800
 Sunnyvale, United States, 37.3836, -122.0255, 153455, 1840021573
