@@ -13,6 +13,7 @@ public class Main {
         options.add("Customer", () -> {new Customer().showOptions();});
         options.add("Logistics Department", () -> {new LogisticsDep().showOptions();});
         options.add("Consumer Logistics Department", () -> {new ConsumerLogistics().showOptions();});
+        options.add("Marketing Department", () -> {new MarketingDepartment().showOptions();});
         options.add("Choreographer", () -> {new Choreographer().showOptions();});
         options.add("Stakeholder", () -> {new Stakeholder().showOptions();});
         options.add("Manager", () -> {new Manager().showOptions();});

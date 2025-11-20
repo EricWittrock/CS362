@@ -53,6 +53,22 @@ public class MediaContract implements DatabaseObject
     public long getEndDate() {
         return endDate;
     }
+    
+    public void setTotalPayment(int totalPayment) {
+        this.totalPayment = totalPayment;
+    }
+
+    public void setEventCovered(Event eventCovered) {
+        this.eventCovered = eventCovered;
+    }
+
+    public void setStartDate(long startDate) {
+        this.startDate = startDate;
+    }
+
+    public void setEndDate(long endDate) {
+        this.endDate = endDate;
+    }
 
     public boolean contractAccepted()
     {
