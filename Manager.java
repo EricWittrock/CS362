@@ -216,7 +216,7 @@ class Manager implements Actor {
 
         System.out.println("\nInsurance policy created successfully!");
         System.out.println("  Wrestler: " + wrestler.getName());
-        System.out.println("  Coverage Amount: $" + String.format("%.2f", coverageAmount));
+        System.out.println("  Coverage Amount: $" + coverageAmount);
         System.out.println("  Max Danger Rating: " + maxDanger + "/10");
         System.out.println("  Valid for: 1 year");
         System.out.println("  Covers: All action types");

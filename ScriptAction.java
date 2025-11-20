@@ -106,7 +106,7 @@ public class ScriptAction implements DatabaseObject {
 
     @Override
     public void deserialize(String data) {
-        String [] parts = data.split("\\|", 8);
+        String [] parts = data.split(",", 8);
         this.actionId = Integer.parseInt(parts[0]);
         this.scriptId = Integer.parseInt(parts[1]);
         this.actionType = ActionType.valueOf(parts[2]);
