@@ -161,7 +161,7 @@ public class WorkerPayrollService {
         int count = batch.paymentsByDept.values().stream()
                 .mapToInt(List::size).sum();
 
-        System.out.println("\n✓ Payroll processed successfully!");
+        System.out.println("\nPayroll processed successfully!");
         System.out.println("  " + count + " workers paid");
         System.out.println("  Total disbursed: $" + batch.grandTotal);
         System.out.println("\n  Note: Budget allocation handled separately");

@@ -45,7 +45,7 @@ public class FundsController implements Actor {
         }
 
         fund.charge(amount);
-        System.out.println("\n✓ " + description + ": $" + amount);
+        System.out.println("\n" + description + ": $" + amount);
         System.out.println("  Remaining: $" + fund.funds());
         return true;
     }
@@ -165,7 +165,7 @@ public class FundsController implements Actor {
         int amount = UserInput.getIntInput();
 
         selectedFund.fund(amount);
-        System.out.println("\n✓ Added $" + amount + " to " + selectedFund.getName());
+        System.out.println("\nAdded $" + amount + " to " + selectedFund.getName());
         System.out.println("  New total: $" + selectedFund.funds());
     }
 
@@ -176,6 +176,6 @@ public class FundsController implements Actor {
         int amount = UserInput.getIntInput();
 
         new Budget(name, amount);
-        System.out.println("\n✓ Created " + name + " fund with $" + amount);
+        System.out.println("\nCreated " + name + " fund with $" + amount);
     }
 }
