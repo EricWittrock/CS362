@@ -105,7 +105,7 @@ class Script implements DatabaseObject {
         for (Integer actionId : actionIds) {
             ScriptAction action = DataCache.getById(actionId, ScriptAction::new);
             if (action != null) {
-                totalMultiplier *= action.getInsuranceMultiplier();
+                totalMultiplier += action.getInsuranceMultiplier();
             }
         }
 

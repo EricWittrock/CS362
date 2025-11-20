@@ -216,7 +216,7 @@ class Choreographer implements Actor {
             System.out.println("\n#" + action.getSequenceOrder() + " - " + action.getActionType());
             System.out.println("    Action ID: " + action.getActionId());
             System.out.println("    Description: " + action.getDescription());
-            System.out.println("    Wrestlers " + getWrestlerNames(action.getWrestlerIds()));
+            System.out.println("    Wrestlers: " + getWrestlerNames(action.getWrestlerIds()));
             System.out.println("    Danger Rating: " + action.getDangerRating());
             System.out.println("    Duration: " + action.getEstimatedDuration() + " mins");
             System.out.println("    Insurance Multiplier: " + action.getInsuranceMultiplier() + "x");
@@ -284,6 +284,7 @@ class Choreographer implements Actor {
         );
 
         script.addActionId(action.getActionId());
+        DataCache.addObject(script);
 
         System.out.println("\nAction added successfully!");
         System.out.println(" New total actions: " + script.getActionIds().size());
@@ -347,6 +348,7 @@ class Choreographer implements Actor {
                 int typeChoice = UserInput.getIntInput(1, types.length);
                 action.setActionType(types[typeChoice - 1]);
                 System.out.println(" Action type updated to: " + types[typeChoice - 1]);
+                DataCache.addObject(action);
                 break;
                 
             case 2: // Edit Description
@@ -354,6 +356,7 @@ class Choreographer implements Actor {
                 String newDesc = UserInput.getStringInput();
                 action.setDescription(newDesc);
                 System.out.println("Description updated");
+                DataCache.addObject(action);
                 break;
                 
             case 3: // Edit Wrestlers
@@ -380,6 +383,7 @@ class Choreographer implements Actor {
                 }
                 action.setWrestlerIds(newWrestlerIds);
                 System.out.println("Wrestlers updated");
+                DataCache.addObject(action);
                 break;
                 
             case 4: // Edit Danger Rating
@@ -387,6 +391,7 @@ class Choreographer implements Actor {
                 int newDanger = UserInput.getIntInput(1, 10);
                 action.setDangerRating(newDanger);
                 System.out.println("Danger rating updated to: " + newDanger);
+                DataCache.addObject(action);
                 break;
                 
             case 5: // Edit Duration
@@ -394,6 +399,7 @@ class Choreographer implements Actor {
                 int newDuration = UserInput.getIntInput(1, 180);
                 action.setDuration(newDuration);
                 System.out.println("Duration updated to: " + newDuration + " minutes");
+                DataCache.addObject(action);
                 break;
         }
         
@@ -425,6 +431,7 @@ class Choreographer implements Actor {
 
         ScriptAction toRemove = actions.get(choice - 1);
         script.removeActionId(toRemove.getActionId());
+        DataCache.addObject(script);
 
         // reorder remaining actions
         List<ScriptAction> remaining = DataCache.getAll(ScriptAction::new).stream()
@@ -432,6 +439,7 @@ class Choreographer implements Actor {
             .collect(Collectors.toList());
         for (int i = 0; i < remaining.size(); i++) {
             remaining.get(i).setSequenceOrder(i + 1);
+            DataCache.addObject(remaining.get(i));
         }
 
         System.out.println("\nAction removed successfully!");
@@ -474,6 +482,7 @@ class Choreographer implements Actor {
         // update sequence orders
         for (int i = 0; i < actions.size(); i++) {
             actions.get(i).setSequenceOrder(i + 1);
+            DataCache.addObject(actions.get(i));
         }
 
         System.out.println("\nActions reordered successfully!");
@@ -518,6 +527,7 @@ class Choreographer implements Actor {
         // change status
         script.setStatus(ScriptStatus.UNDER_REVIEW);
         script.setRejectionReason(null); // clear old feedback
+        DataCache.addObject(script);
 
         System.out.println("\n Script submitted for review successfully!");
         System.out.println("  Script ID: " + script.getScriptId());

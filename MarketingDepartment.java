@@ -101,18 +101,14 @@ public class MarketingDepartment implements Actor {
             return;
         }
         for (Advertisement advertisement : ads) {
-            if(advertisement.getContract().isExpired())
-            {
-                advertisement.setStatus(ScriptStatus.ARCHIVED);
-                ads.remove(advertisement);
-            }
             advertisement.printDetails();
         }
     }
 
     public void archiveAdvertisements() {
         List<Advertisement> ads = DataCache.getAllByFilter(a -> a.getStatus()
-        .equals(ScriptStatus.APPROVED), Advertisement::new);
+        .equals(ScriptStatus.APPROVED) || a.getStatus().equals(ScriptStatus.REJECTED)
+        || a.getContract().isExpired(), Advertisement::new);
         if (ads.isEmpty())
         {
             System.out.println("No advertisement suggestions to archive.");
@@ -121,12 +117,6 @@ public class MarketingDepartment implements Actor {
         OptionList options = new OptionList();
         options.addExitOption("Back");
         for (Advertisement advertisement : ads) {
-            if(advertisement.getContract().isExpired())
-            {
-                advertisement.setStatus(ScriptStatus.ARCHIVED);
-                ads.remove(advertisement);
-            }
-
             advertisement.printDetails();
             options.add(advertisement.serialize(), () -> {
                 archive(advertisement);
