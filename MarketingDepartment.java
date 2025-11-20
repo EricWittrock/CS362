@@ -107,7 +107,8 @@ public class MarketingDepartment implements Actor {
 
     public void archiveAdvertisements() {
         List<Advertisement> ads = DataCache.getAllByFilter(a -> a.getStatus()
-        .equals(ScriptStatus.APPROVED), Advertisement::new);
+        .equals(ScriptStatus.APPROVED) || a.getStatus().equals(ScriptStatus.REJECTED)
+        || a.getContract().isExpired(), Advertisement::new);
         if (ads.isEmpty())
         {
             System.out.println("No advertisement suggestions to archive.");
