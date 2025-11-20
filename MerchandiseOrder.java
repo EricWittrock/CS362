@@ -1,6 +1,8 @@
+import java.util.Random;
+
 public class MerchandiseOrder implements DatabaseObject
 {
-    private int id = 0;
+    private int id;
     private Merchandise merchandise;
     private int quantity;
     private Venue venue;
@@ -9,7 +11,7 @@ public class MerchandiseOrder implements DatabaseObject
 
     public MerchandiseOrder(Merchandise merchandise, int quantity, Venue venue)
     {
-        id++;
+        id = new Random().nextInt(Integer.MAX_VALUE);
         this.merchandise = merchandise;
         this.quantity = quantity;
         this.venue = venue;
@@ -37,17 +39,19 @@ public class MerchandiseOrder implements DatabaseObject
 
     @Override
     public String serialize() {
-        return id + "," + merchandise.getId()
-        + "," + quantity + "," + venue.getId(); 
+        return id + "," + merchandise.getName()
+        + "," + quantity + "," + venue.getLocation(); 
     }
 
     @Override
     public void deserialize(String data) {
         String[] parts = data.split(",");
         this.id = Integer.parseInt(parts[0]);
-        this.merchandise = DataCache.getById(Integer.parseInt(parts[1]), Merchandise::new);
+        this.merchandise = DataCache.getByFilter(m -> m.getName()
+            .equalsIgnoreCase(parts[1]), Merchandise::new);
         this.quantity = Integer.parseInt(parts[2]);
-        this.venue = DataCache.getById(Integer.parseInt(parts[3]), Venue::new);
+        this.venue = DataCache.getByFilter(v -> v.getLocation()
+            .equalsIgnoreCase(parts[3]), Venue::new);
     }
     
 }

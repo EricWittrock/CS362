@@ -172,6 +172,8 @@ class DataCache {
             case "WrestlerInsurance": return "./Data/WrestlerInsurances.txt";
             case "Section": return "./Data/Sections.txt";
             case "Budget": return "./Data/Budget.txt";
+            case "Advertisement": return "./Data/Advertisement.txt";
+            case "MediaContract": return "./Data/MediaContract.txt";
             default: return null;
         }
     }

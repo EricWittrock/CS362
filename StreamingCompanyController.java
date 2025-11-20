@@ -8,14 +8,27 @@ public class StreamingCompanyController implements Actor {
         options.add("View Media Contract", this::viewMediaContract);
         options.add("Edit Media Contract", this::editMediaContract);
         options.add("Submit Media Contract", this::submitMediaContract);
-        options.add("Propose Advertisement", this::proposeAdvertisement);
+        options.add("Suggest Advertisement", this::suggestAdvertisement);
 
         options.loopDisplayAndSelect("\nStreaming Company Options\nEnter a number: ");
     }
 
-    public void proposeAdvertisement()
+    public void suggestAdvertisement()
     {
-        
+        StreamingCompany company = getCompany();
+        MediaContract contract = company.getContract();
+        if (company.getContract() == null || !contract.getStatus().equals(ScriptStatus.APPROVED))
+        {
+            System.out.println("Cannot propose an advertisement without an approved media contract.");
+            return;
+        }
+        System.out.println("Enter advertisement content proposal: ");
+        String adContent = UserInput.getStringInput().trim();
+        Advertisement ad = new Advertisement(contract, company, adContent);
+        System.out.println("Proposed budget for ad: ");
+        int budgetNum = UserInput.getIntInput();
+        Budget budget = new Budget(adContent, budgetNum);
+        ad.setBudget(budget);
     }
 
     public void proposeContract()
