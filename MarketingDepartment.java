@@ -101,6 +101,11 @@ public class MarketingDepartment implements Actor {
             return;
         }
         for (Advertisement advertisement : ads) {
+            if(advertisement.getContract().isExpired())
+            {
+                advertisement.setStatus(ScriptStatus.ARCHIVED);
+                ads.remove(advertisement);
+            }
             advertisement.printDetails();
         }
     }
