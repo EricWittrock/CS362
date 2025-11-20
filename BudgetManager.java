@@ -32,7 +32,7 @@ public class BudgetManager implements Actor {
             to.fund(amount);
             System.out.println("Allocated $" + amount + " from " + payer.getName() + " to " + payee.getName());
         } else {
-            System.out.println("Insufficient funds. Only " + from.funds() + " in " + payer + " budget.");
+            System.out.println("Insufficient funds. Only $" + from.funds() + " in " + payer.getName() + " budget.");
         }
     }
 

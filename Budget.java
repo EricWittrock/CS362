@@ -51,7 +51,7 @@ public class Budget implements DatabaseObject {
     }
 
     public void charge(int amount) {
-        totalBudget -= amount;
+        remainingBudget -= amount;
     }
 
     public void print() {
