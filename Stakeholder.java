@@ -222,6 +222,7 @@ public class Stakeholder implements Actor {
         script.setStatus(ScriptStatus.APPROVED);
         script.setApprovedBy(this.name + " (" + this.role + ")");
         script.setApprovedDate(System.currentTimeMillis());
+        DataCache.addObject(script);
 
         System.out.println("Script " + script.getScriptId() + " has been APPROVED.");
         System.out.println("   Approved by: " + this.name);
@@ -272,6 +273,7 @@ public class Stakeholder implements Actor {
         System.out.println("Script " + script.getScriptId() + " has been REJECTED.");
         System.out.println("   Reason: " + reason);
         System.out.println("   Choreographer '" + script.getChoreographer() + "' will be notified.");
+        DataCache.addObject(script);
     }
 
     private void requestRevision() {
@@ -312,12 +314,14 @@ public class Stakeholder implements Actor {
         System.out.println("\nRevision requested for Script " + script.getScriptId());
         System.out.println("  Choreographer '" + script.getChoreographer() + "' will receive these notes:");
         System.out.println("  \"" + notes + "\"");
+        DataCache.addObject(script);
     }
 
     private void requestRevisionWithError(Script script, List<String> errors) {
         String notes = "Validation failed. Please address:\n" + String.join("\n", errors);
         script.setStatus(ScriptStatus.REQUIRES_REVISION);
         script.setRejectionReason(notes);
+        DataCache.addObject(script);
 
         System.out.println("\nRevision requested for Script " + script.getScriptId());    
     }
