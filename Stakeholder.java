@@ -44,7 +44,7 @@ public class Stakeholder implements Actor {
     }
 
     private void viewPendingScripts() {
-        List<Script> pendingScripts = DataCache.getAllScripts().stream()
+        List<Script> pendingScripts = DataCache.getAll(Script::new).stream()
             .filter(s -> s.getStatus() == ScriptStatus.PROPOSED ||
                          s.getStatus() == ScriptStatus.UNDER_REVIEW)
             .collect(Collectors.toList());
@@ -59,7 +59,7 @@ public class Stakeholder implements Actor {
         System.out.println("=".repeat(80));
         
         for (Script script : pendingScripts) {
-            Event event = DataCache.getEventById(Integer.parseInt(script.getEventId()));
+            Event event = DataCache.getById(script.getEventId(), Event::new);
 
             System.out.println("\nScript ID: " + script.getScriptId());
             System.out.println("  Event: " + (event != null ? event.getLocationName() : "Event ID " + script.getEventId()));
@@ -73,7 +73,7 @@ public class Stakeholder implements Actor {
     }
 
     private void viewScriptDetails() {
-        List<Script> allScripts = DataCache.getAllScripts();
+        List<Script> allScripts = DataCache.getAll(Script::new);
         if (allScripts.isEmpty()) {
             System.out.println("\nNo scripts found in system.");
             return;
@@ -100,7 +100,7 @@ public class Stakeholder implements Actor {
     }
 
     private void displayFullScriptDetails(Script script) {
-        Event event = DataCache.getEventById(Integer.parseInt(script.getEventId()));
+        Event event = DataCache.getById(script.getEventId(), Event::new);
 
         System.out.println("\n" + "=".repeat(80));
         System.out.println("SCRIPT DETAILS - ID: " + script.getScriptId());
@@ -126,7 +126,10 @@ public class Stakeholder implements Actor {
         System.out.println("  Required Wrestlers: " + script.getRequiredWrestlerIds().size());
         
         System.out.println("\nACTIONS:");
-        List<ScriptAction> actions = DataCache.getActionsForScript(script.getScriptId());
+        List<ScriptAction> actions = DataCache.getAllByFilter(
+            a -> a.getScriptId() == script.getScriptId(), 
+            ScriptAction::new
+        );
         for (ScriptAction action : actions) {
             System.out.println("\n  #" + action.getSequenceOrder() + " - " + action.getActionType());
             System.out.println("      Description: " + action.getDescription());
@@ -141,7 +144,7 @@ public class Stakeholder implements Actor {
     private String getWrestlerNames(List<Integer> wrestlerIds) {
         List<String> names = new ArrayList<>();
         for (Integer id : wrestlerIds) {
-            Wrestler wrestler = DataCache.getWrestlerById(id);
+            Wrestler wrestler = DataCache.getById(id.intValue(), Wrestler::new);
             if (wrestler != null) {
                 names.add(wrestler.getName());
             } else {
@@ -152,7 +155,7 @@ public class Stakeholder implements Actor {
     }
 
     private void approveScript() {
-        List<Script> approvableScripts = DataCache.getAllScripts().stream()
+        List<Script> approvableScripts = DataCache.getAll(Script::new).stream()
             .filter(s -> s.getStatus() == ScriptStatus.PROPOSED ||
                         s.getStatus() == ScriptStatus.UNDER_REVIEW)
             .collect(Collectors.toList());
@@ -227,7 +230,7 @@ public class Stakeholder implements Actor {
     }
 
     private void rejectScript() {
-        List<Script> rejectableScripts = DataCache.getAllScripts().stream()
+        List<Script> rejectableScripts = DataCache.getAll(Script::new).stream()
             .filter(s -> s.getStatus() != ScriptStatus.APPROVED &&
                         s.getStatus() != ScriptStatus.REJECTED)
             .collect(Collectors.toList());
@@ -272,7 +275,7 @@ public class Stakeholder implements Actor {
     }
 
     private void requestRevision() {
-        List<Script> revisionableScripts = DataCache.getAllScripts().stream()
+        List<Script> revisionableScripts = DataCache.getAll(Script::new).stream()
             .filter(s -> s.getStatus() == ScriptStatus.PROPOSED ||
                         s.getStatus() == ScriptStatus.UNDER_REVIEW)
             .collect(Collectors.toList());

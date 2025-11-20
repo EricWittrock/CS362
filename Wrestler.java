@@ -13,7 +13,7 @@ public class Wrestler implements DatabaseObject{
         this.name = name;
         this.specialty = specialty;
 
-        DataCache.addWrestler(this);
+        DataCache.addObject(this);
     }
 
     public String getName() {

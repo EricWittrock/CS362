@@ -28,15 +28,15 @@ public class WorkerPayment implements DatabaseObject {
         this.totalHours = totalHours;
 
 
-        DataCache.addWorkerPayment(this);
+        DataCache.addObject(this);
     }
 
     public int getPaymentId() { return paymentId; }
     public int getWorkerId() { return workerId; }
-    public double getBasePay() { return basePay; }
-    public double getOvertimePay() { return overtimePay; }
-    public double getHazardPay() { return hazardPay; }
-    public double getTotalPay() { return totalPay; }
+    public int getBasePay() { return basePay; }
+    public int getOvertimePay() { return overtimePay; }
+    public int getHazardPay() { return hazardPay; }
+    public int getTotalPay() { return totalPay; }
     public long getPaymentDate() { return paymentDate; }
     public String getPaymentPeriod() { return paymentPeriod; }
     public int getTotalHours() { return totalHours; }
@@ -48,14 +48,14 @@ public class WorkerPayment implements DatabaseObject {
 
     @Override
     public String serialize() {
-        return paymentId + "|" + workerId + "|" + basePay + "|" + 
-               overtimePay + "|" + hazardPay + "|" + totalPay + "|" + 
-               paymentDate + "|" + paymentPeriod + "|" + totalHours;
+        return paymentId + "," + workerId + "," + basePay + "," + 
+               overtimePay + "," + hazardPay + "," + totalPay + "," + 
+               paymentDate + "," + paymentPeriod + "," + totalHours;
     }
 
     @Override
     public void deserialize(String data) {
-        String[] parts = data.split("\\|", 9);
+        String[] parts = data.split(",", 9);
         this.paymentId = Integer.parseInt(parts[0]);
         this.workerId = Integer.parseInt(parts[1]);
         this.basePay = Integer.parseInt(parts[2]);

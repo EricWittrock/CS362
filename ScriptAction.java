@@ -34,7 +34,7 @@ public class ScriptAction implements DatabaseObject {
         this.estimatedDuration = estimatedDuration;
         this.sequenceOrder = sequenceOrder;
 
-        DataCache.addScriptAction(this);
+        DataCache.addObject(this);
     }
 
     // getters
@@ -99,9 +99,9 @@ public class ScriptAction implements DatabaseObject {
                 .map(String::valueOf)
                 .collect(Collectors.joining(";"));
         
-        return actionId + "|" + scriptId + "|" + actionType + "|" + 
-                description + "|" + wrestlerIdsString + "|" + dangerRating + "|" +
-                estimatedDuration + "|" + sequenceOrder;
+        return actionId + "," + scriptId + "," + actionType + "," + 
+                description + "," + wrestlerIdsString + "," + dangerRating + "," +
+                estimatedDuration + "," + sequenceOrder;
     }
 
     @Override

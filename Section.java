@@ -21,7 +21,7 @@ public class Section implements DatabaseObject {
             takenSeats.add(false);
         }
 
-        DataCache.addSection(this);
+        DataCache.addObject(this);
     }
 
     public String getName() {
@@ -32,7 +32,7 @@ public class Section implements DatabaseObject {
         return numSeats;
     }
 
-    public double getPrice() {
+    public int getPrice() {
         return price;
     }
 

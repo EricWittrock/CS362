@@ -30,7 +30,32 @@ public class Database {
         }
     }
 
+    public void overwriteAll(ArrayList<DatabaseObject> objects, String filename) {
+        ensureFileExists(filename);
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filename, false))) {
+            for (DatabaseObject obj : objects) {
+                bw.write(obj.serialize());
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void overwriteAllLines(ArrayList<String> lines, String filename) {
+        ensureFileExists(filename);
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filename, false))) {
+            for (String line : lines) {
+                bw.write(line);
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public <T extends DatabaseObject> ArrayList<T> getAll(String filename, Supplier<T> factory) {
+        ensureFileExists(filename);
         ArrayList<T> objects = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
@@ -47,4 +72,21 @@ public class Database {
 
         return objects;
     }
-}
+
+    public ArrayList<String> getAllLines(String filename) {
+        ensureFileExists(filename);
+        ArrayList<String> lines = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (line.trim().isEmpty()) continue; // skip empty lines
+                lines.add(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return lines;
+    }
+ }

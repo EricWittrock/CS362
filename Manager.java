@@ -50,13 +50,13 @@ class Manager implements Actor {
         }
 
         Wrestler wrestler = new Wrestler(name, specialty);
-        DataCache.addWrestler(wrestler);
+        DataCache.addObject(wrestler);
         System.out.println("Wrestler added successfully with ID: " + wrestler.getId());
     }
 
     private void viewAllWrestlers() {
         System.out.println("\n--- All Wrestlers ---");
-        List<Wrestler> wrestlers = DataCache.getAllWrestlers();
+        List<Wrestler> wrestlers = DataCache.getAll(Wrestler::new);
         
         if (wrestlers.isEmpty()) {
             System.out.println("No wrestlers in system.");
@@ -71,7 +71,7 @@ class Manager implements Actor {
         System.out.println("\n--- Schedule Wrestler for Event ---");
         
         // Show available events
-        List<Event> events = DataCache.getAllEvents();
+        List<Event> events = DataCache.getAll(Event::new);
         if (events.isEmpty()) {
             System.out.println("No events found in the system.");
             return;
@@ -86,7 +86,7 @@ class Manager implements Actor {
         int eventId = UserInput.getIntInput(0, Integer.MAX_VALUE);
 
         // Check if event exists
-        Event event = DataCache.getEventById(eventId);
+        Event event = DataCache.getById(eventId, Event::new);
         if (event == null) {
             System.out.println("Error: Event not found.");
             return;
@@ -99,14 +99,15 @@ class Manager implements Actor {
         int wrestlerId = UserInput.getIntInput(0, Integer.MAX_VALUE);
 
         // Check if wrestler exists
-        Wrestler wrestler = DataCache.getWrestlerById(wrestlerId);
+        Wrestler wrestler = DataCache.getById(wrestlerId, Wrestler::new);
+
         if (wrestler == null) {
             System.out.println("Error: Wrestler not found.");
             return;
         }
 
         // Check if already scheduled
-        List<WrestlerSchedule> schedules = DataCache.getAllWrestlerSchedules();
+        List<WrestlerSchedule> schedules = DataCache.getAll(WrestlerSchedule::new);
         for (WrestlerSchedule ws : schedules) {
             if (ws.getEventId() == eventId && ws.getWrestlerId() == wrestlerId) {
                 System.out.println("Error: Wrestler already scheduled for this event.");
@@ -115,7 +116,7 @@ class Manager implements Actor {
         }
 
         WrestlerSchedule schedule = new WrestlerSchedule(eventId, wrestlerId);
-        DataCache.addWrestlerSchedule(schedule);
+        DataCache.addObject(schedule);
         System.out.println("Wrestler " + wrestler.getName() + " scheduled successfully for event on " + event.getDate());
     }
 
@@ -125,7 +126,7 @@ class Manager implements Actor {
         int eventId = UserInput.getIntInput(0, Integer.MAX_VALUE);
 
         // Check if event exists
-        Event event = DataCache.getEventById(eventId);
+        Event event = DataCache.getById(eventId, Event::new);
         if (event == null) {
             System.out.println("Error: Event not found.");
             return;
@@ -134,12 +135,12 @@ class Manager implements Actor {
         System.out.println("\nEvent: " + event.getDate() + " at " + event.getLocationName());
         System.out.println("Scheduled Wrestlers:");
 
-        List<WrestlerSchedule> schedules = DataCache.getAllWrestlerSchedules();
+        List<WrestlerSchedule> schedules = DataCache.getAll(WrestlerSchedule::new);
         boolean found = false;
 
         for (WrestlerSchedule ws : schedules) {
             if (ws.getEventId() == eventId) {
-                Wrestler wrestler = DataCache.getWrestlerById(ws.getWrestlerId());
+                Wrestler wrestler = DataCache.getById(ws.getWrestlerId(), Wrestler::new);
                 if (wrestler != null) {
                     System.out.println("  - " + wrestler.getName() + " (" + wrestler.getSpecialty() + ")");
                     found = true;
@@ -155,7 +156,7 @@ class Manager implements Actor {
     private void addWrestlerInsurance() {
         System.out.println("\n--- Add Wrestler Insurance ---");
 
-        List<Wrestler> wrestlers = DataCache.getAllWrestlers();
+        List<Wrestler> wrestlers = DataCache.getAll(Wrestler::new);
         if (wrestlers.isEmpty()) {
             System.out.println("No wrestlers in system.");
             return;
@@ -164,7 +165,10 @@ class Manager implements Actor {
         System.out.println("\nWrestlers:");
         for (int i = 0; i < wrestlers.size(); i++) {
             Wrestler w = wrestlers.get(i);
-            WrestlerInsurance existing = DataCache.getInsuranceByWrestlerId(w.getId());
+            WrestlerInsurance existing = DataCache.getByFilter(
+                in -> in.getWrestlerId() == w.getId(), 
+                WrestlerInsurance::new
+            );
             String status = (existing != null && !existing.isExpired()) ? " Insured" : "No Insurance";
             System.out.println((i + 1) + ". " + w.getName() + " - " + status);
         }
@@ -177,7 +181,10 @@ class Manager implements Actor {
         Wrestler wrestler = wrestlers.get(choice - 1);
 
         // Check existing insurance
-        WrestlerInsurance existing = DataCache.getInsuranceByWrestlerId(wrestler.getId());
+        WrestlerInsurance existing = DataCache.getByFilter(
+            i -> i.getWrestlerId() == wrestler.getId(), 
+            WrestlerInsurance::new
+        );
         if (existing != null && !existing.isExpired()) {
             System.out.println("Error: Wrestler already has active insurance.");
             System.out.println("    Coverage: $" + existing.getCoverageAmount());
@@ -191,13 +198,14 @@ class Manager implements Actor {
         int maxDanger = UserInput.getIntInput(1, 10);
         
         // Calculate coverage amount and expiration date
-        double coverageAmount = maxDanger * 10000.0;  // Higher danger = more coverage
+        int coverageAmount = maxDanger * 10000;  // Higher danger = more coverage
         long oneYear = 365L * 24 * 60 * 60 * 1000;
         long expirationDate = System.currentTimeMillis() + oneYear;
 
         // cover all action types by default
         List<ActionType> coveredTypes = new ArrayList<>(Arrays.asList(ActionType.values()));
 
+        // Create and store insurance
         new WrestlerInsurance (
             wrestler.getId(), 
             coverageAmount, 

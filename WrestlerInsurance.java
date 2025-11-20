@@ -4,7 +4,7 @@ import java.util.stream.Collectors;
 public class WrestlerInsurance implements DatabaseObject { 
     private int insuranceId;
     private int wrestlerId;
-    private double coverageAmount;
+    private int coverageAmount;
     private long expirationDate;
     private int maxDangerRating; // maximum danger rating covered (1-10)
     private List<ActionType> coveredActionTypes;
@@ -13,7 +13,7 @@ public class WrestlerInsurance implements DatabaseObject {
         this.coveredActionTypes = new ArrayList<>();
     }
 
-    public WrestlerInsurance(int wrestlerId, double coverageAmount, long expirationDate,
+    public WrestlerInsurance(int wrestlerId, int coverageAmount, long expirationDate,
                             int maxDangerRating, List<ActionType> coveredActionTypes) {
         this.insuranceId = new Random().nextInt(Integer.MAX_VALUE);
         this.wrestlerId = wrestlerId;
@@ -26,12 +26,12 @@ public class WrestlerInsurance implements DatabaseObject {
         this.maxDangerRating = maxDangerRating;
         this.coveredActionTypes = coveredActionTypes;
 
-        DataCache.addWrestlerInsurance(this);
+        DataCache.addObject(this);
     }
 
     public int getInsuranceId() { return insuranceId; }
     public int getWrestlerId() { return wrestlerId; }
-    public double getCoverageAmount() { return coverageAmount; }
+    public int getCoverageAmount() { return coverageAmount; }
     public long getExpirationDate() { return expirationDate; }
     public int getMaxDangerRating() { return maxDangerRating; }
     public List<ActionType> getCoveredActionTypes() { return coveredActionTypes; }
@@ -67,20 +67,20 @@ public class WrestlerInsurance implements DatabaseObject {
             .map(ActionType::name)
             .collect(Collectors.joining(";"));
 
-        return insuranceId + "|" + 
-                wrestlerId + "|" + 
-                coverageAmount + "|" + 
-                expirationDate + "|" + 
-                maxDangerRating + "|" + 
+        return insuranceId + "," + 
+                wrestlerId + "," + 
+                coverageAmount + "," + 
+                expirationDate + "," + 
+                maxDangerRating + "," + 
                 actionTypesStr;
     }
 
     @Override
     public void deserialize(String data) {
-        String[] parts = data.split("\\|", 6);
+        String[] parts = data.split(",", 6);
         this.insuranceId = Integer.parseInt(parts[0]);
         this.wrestlerId = Integer.parseInt(parts[1]);
-        this.coverageAmount = Double.parseDouble(parts[2]);
+        this.coverageAmount = Integer.parseInt(parts[2]);
         this.expirationDate = Long.parseLong(parts[3]);
         this.maxDangerRating = Integer.parseInt(parts[4]);
 

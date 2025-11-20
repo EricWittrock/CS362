@@ -75,13 +75,16 @@ public class ScriptValidator {
         // check 4
         List<Integer> wrestlerIds = script.getRequiredWrestlerIds();
         for (Integer wrestlerId : wrestlerIds) {
-            Wrestler wrestler = DataCache.getWrestlerById(wrestlerId);
+            Wrestler wrestler = DataCache.getById(wrestlerId.intValue(), Wrestler::new);
             if (wrestler == null) {
                 result.addError("Wrestler with ID " + wrestlerId + " not found in the system.");
                 continue;
             }
             
-            WrestlerInsurance insurance = DataCache.getInsuranceByWrestlerId(wrestlerId);
+            WrestlerInsurance insurance = DataCache.getByFilter(
+                i -> i.getWrestlerId() == wrestlerId.intValue(), 
+                WrestlerInsurance::new
+            );
             if (insurance == null) {
                 result.addError("Wrestler " + wrestler.getName() + " has no insurance.");
                 continue;
@@ -94,7 +97,7 @@ public class ScriptValidator {
 
             // check if all actions involving this wrestler are covered
             for (Integer actionId : script.getActionIds()) {
-                ScriptAction action = DataCache.getScriptActionById(actionId);
+                ScriptAction action = DataCache.getById(actionId.intValue(), ScriptAction::new);
                 if (action != null && action.getWrestlerIds().contains(wrestlerId)) {
                     if (!insurance.coversAction(action)) {
                         result.addError("Wrestler '" + wrestler.getName() + 
@@ -109,16 +112,16 @@ public class ScriptValidator {
 
         // check 5
         try {
-            int eventId = Integer.parseInt(script.getEventId());
-            Event event = DataCache.getEventById(eventId);
+            int eventId = script.getEventId();
+            Event event = DataCache.getById(eventId, Event::new);
             if (event == null) {
                 result.addError("Event with ID " + eventId + " not found");
             } else {
                 // check if another script is already approved for this event
-                List<Script> allScripts = DataCache.getAllScripts();
+                List<Script> allScripts = DataCache.getAll(Script::new);
                 for (Script other : allScripts) {
                     if (other.getScriptId() != script.getScriptId() &&
-                        other.getEventId().equals(script.getEventId()) &&
+                        other.getEventId() == script.getEventId() &&
                         other.getStatus() == ScriptStatus.APPROVED) {
                         result.addError("Event already has an approved script (Script ID: " + other.getScriptId() + ")");
                         break;

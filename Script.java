@@ -2,7 +2,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 class Script implements DatabaseObject {
-    private String eventId;
+    private int eventId;
     private String choreographer;
     private int scriptId;
     private ScriptStatus status; // current status of the script
@@ -11,13 +11,13 @@ class Script implements DatabaseObject {
     private long proposedDate; // When the script was submitted
     private long approvedDate; // When the script was approved (0 if not approved yet)
     private String approvedBy; // Stakeholder name who approved 
-    private double totalInsuranceCost; // calaculated cost
+    private int totalInsuranceCost; // calaculated cost
 
     public Script() {
         this.actionIds = new ArrayList<>();
     }
 
-    public Script(String eventId, String choreographer) {
+    public Script(int eventId, String choreographer) {
         this.eventId = eventId;
         this.choreographer = choreographer;
         this.scriptId = new Random().nextInt(Integer.MAX_VALUE);
@@ -28,12 +28,11 @@ class Script implements DatabaseObject {
         this.proposedDate = System.currentTimeMillis();
         this.approvedDate = 0;
         this.approvedBy = null;
-        this.totalInsuranceCost = 0.0;
-        DataCache.addScript(this);
-
+        this.totalInsuranceCost = 0;
+        DataCache.addObject(this);
     }
 
-    public String getEventId() { return eventId; }
+    public int getEventId() { return eventId; }
     public String getChoreographer() { return choreographer; }
     public int getScriptId() { return scriptId; }
     public ScriptStatus getStatus() { return status; }
@@ -42,7 +41,7 @@ class Script implements DatabaseObject {
     public long getProposedDate() { return proposedDate; }
     public long getApprovedDate() { return approvedDate; }
     public String getApprovedBy() { return approvedBy; }
-    public double getTotalInsuranceCost() { return totalInsuranceCost; }
+    public int getTotalInsuranceCost() { return totalInsuranceCost; }
 
     public void setStatus(ScriptStatus status) {
         this.status = status;
@@ -79,7 +78,8 @@ class Script implements DatabaseObject {
         int totalDuration = 0;
 
         for (Integer actionId : actionIds) {
-            ScriptAction action = DataCache.getScriptActionById(actionId);
+            ScriptAction action = DataCache.getById(actionId, ScriptAction::new);
+            
             if (action != null) {
                 int duration = action.getEstimatedDuration();
                 int danger = action.getDangerRating();
@@ -94,8 +94,8 @@ class Script implements DatabaseObject {
     }
 
     public double calculateInsuranceCost() {
-        double baseCost = 5000.0; // base insurance cost
-        double totalMultiplier = 1.0;
+        int baseCost = 5000; // base insurance cost
+        int totalMultiplier = 1;
 
         if (actionIds.isEmpty()) {
             this.totalInsuranceCost = baseCost;
@@ -103,7 +103,7 @@ class Script implements DatabaseObject {
         }
 
         for (Integer actionId : actionIds) {
-            ScriptAction action = DataCache.getScriptActionById(actionId);
+            ScriptAction action = DataCache.getById(actionId, ScriptAction::new);
             if (action != null) {
                 totalMultiplier *= action.getInsuranceMultiplier();
             }
@@ -118,7 +118,7 @@ class Script implements DatabaseObject {
         Set<Integer> uniqueWrestlerIds = new HashSet<>();
         
         for (Integer actionId : actionIds) {
-            ScriptAction action = DataCache.getScriptActionById(actionId);
+            ScriptAction action = DataCache.getById(actionId, ScriptAction::new);
             if (action != null) {
                 uniqueWrestlerIds.addAll(action.getWrestlerIds());
             }
@@ -141,30 +141,30 @@ class Script implements DatabaseObject {
                     .collect(Collectors.joining(";"));
         }
 
-        return scriptId + "|" +
-               eventId + "|" +
-               choreographer + "|" + 
-               status + "|" +
-               (rejectionReason != null ? rejectionReason : "") + "|" +
-               proposedDate + "|" +
-               approvedDate + "|" +
-               (approvedBy != null ? approvedBy : "") + "|" +
-               totalInsuranceCost + "|" +
+        return scriptId + "," +
+               eventId + "," +
+               choreographer + "," + 
+               status + "," +
+               (rejectionReason != null ? rejectionReason : "") + "," +
+               proposedDate + "," +
+               approvedDate + "," +
+               (approvedBy != null ? approvedBy : "") + "," +
+               totalInsuranceCost + "," +
                actionIdsStr;
     }
 
     @Override
     public void deserialize(String data) {
-        String[] parts = data.split("\\|", 10);
+        String[] parts = data.split(",", 10);
         this.scriptId = Integer.parseInt(parts[0]);
-        this.eventId = parts[1];
+        this.eventId = Integer.parseInt(parts[1]);
         this.choreographer = parts[2];
         this.status = ScriptStatus.valueOf(parts[3]);
         this.rejectionReason = parts[4].isEmpty() ? null : parts[4];
         this.proposedDate = Long.parseLong(parts[5]);
         this.approvedDate = Long.parseLong(parts[6]);
         this.approvedBy = parts[7].isEmpty() ? null : parts[7];
-        this.totalInsuranceCost = Double.parseDouble(parts[8]);
+        this.totalInsuranceCost = Integer.parseInt(parts[8]);
 
         this.actionIds = new ArrayList<>();
         if (!parts[9].isEmpty()) {

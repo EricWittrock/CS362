@@ -15,7 +15,7 @@ public class WrestlerSchedule implements DatabaseObject {
 
         System.out.println("Creating WrestlerSchedule: " + this.wrestlerId);
 
-        DataCache.addWrestlerSchedule(this);
+        DataCache.addObject(this);
     }
 
     public int getEventId() {

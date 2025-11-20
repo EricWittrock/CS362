@@ -16,7 +16,7 @@ public class WorkerAssignment implements DatabaseObject{
         this.hoursWorked = hoursWorked;
         this.isHazardous = isHazardous;
 
-        DataCache.addWorkerAssignment(this);
+        DataCache.addObject(this);
     }
 
     public int getAssignmentId() { return assignmentId; }
@@ -32,13 +32,13 @@ public class WorkerAssignment implements DatabaseObject{
 
     @Override
     public String serialize() {
-        return assignmentId + "|" + workerId + "|" + eventId + "|" + 
-               hoursWorked + "|" + isHazardous;
+        return assignmentId + "," + workerId + "," + eventId + "," + 
+               hoursWorked + "," + isHazardous;
     }
 
     @Override
     public void deserialize(String data) {
-        String[] parts = data.split("\\|", 5);
+        String[] parts = data.split(",", 5);
         this.assignmentId = Integer.parseInt(parts[0]);
         this.workerId = Integer.parseInt(parts[1]);
         this.eventId = Integer.parseInt(parts[2]);

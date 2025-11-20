@@ -1,5 +1,7 @@
 import java.util.*;
 
+import javax.xml.crypto.Data;
+
 public class Event implements DatabaseObject {
     private int eventId;
     private String date;
@@ -12,7 +14,7 @@ public class Event implements DatabaseObject {
         this.date = date;
         this.venue = venue;
 
-        DataCache.addEvent(this);
+        DataCache.addObject(this);
     }
 
     public String getDate() {
@@ -31,10 +33,6 @@ public class Event implements DatabaseObject {
         return venue.getSections();
     }
 
-    public int getEventId() {
-        return eventId;
-    }
-
     public String getLocationName() {
         return venue != null ? venue.getName() : "Unknown";
     }
@@ -49,10 +47,12 @@ public class Event implements DatabaseObject {
     @Override
     public void deserialize(String data) { 
         String[] parts = data.split(",", 3);
-        this.eventId = Integer.parseInt(parts[0]);
-        this.date = parts[1];
-        int venueId = Integer.parseInt(parts[2]);
-        this.venue = DataCache.getVenueById(venueId);
+        this.eventId = Integer.parseInt(parts[0].trim());
+        this.date = parts[1].trim();
+        int venueId = Integer.parseInt(parts[2].trim());
+        
+        this.venue = DataCache.getById(venueId, Venue::new);
+
         System.out.println(venueId);
         System.out.println(this.venue.getName());
     }

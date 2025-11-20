@@ -24,18 +24,18 @@ public class WrestlerPayment implements DatabaseObject {
         this.paymentDate = System.currentTimeMillis();
         this.numHighRiskActions = numHighRiskActions;
 
-        Event event = DataCache.getEventById(eventId);
+        Event event = DataCache.getById(eventId, Event::new);
         this.paymentPeriod = event != null ? "Event on " + event.getDate() : "Event ID" + eventId;
 
-        DataCache.addWrestlerPayment(this);
+        DataCache.addObject(this);
     }
 
     public int getPaymentId() { return paymentId; }
     public int getWrestlerId() { return wrestlerId; }
     public int getEventId() { return eventId; }
-    public double getBasePay() { return basePay; }
-    public double getBonusAmount() { return bonusAmount; }
-    public double getTotalPay() { return totalPay; }
+    public int getBasePay() { return basePay; }
+    public int getBonusAmount() { return bonusAmount; }
+    public int getTotalPay() { return totalPay; }
     public long getPaymentDate() { return paymentDate; }
     public String getPaymentPeriod() { return paymentPeriod; }
     public int getNumHighRiskActions() { return numHighRiskActions; }
@@ -47,14 +47,14 @@ public class WrestlerPayment implements DatabaseObject {
 
     @Override
     public String serialize() {
-        return paymentId + "|" + wrestlerId + "|" + eventId + "|" + 
-               basePay + "|" + bonusAmount + "|" + totalPay + "|" + 
-               paymentDate + "|" + paymentPeriod + "|" + numHighRiskActions;
+        return paymentId + "," + wrestlerId + "," + eventId + "," + 
+               basePay + "," + bonusAmount + "," + totalPay + "," + 
+               paymentDate + "," + paymentPeriod + "," + numHighRiskActions;
     }
 
     @Override
     public void deserialize(String data) {
-        String[] parts = data.split("\\|", 9);
+        String[] parts = data.split(",", 9);
         this.paymentId = Integer.parseInt(parts[0]);
         this.wrestlerId = Integer.parseInt(parts[1]);
         this.eventId = Integer.parseInt(parts[2]);

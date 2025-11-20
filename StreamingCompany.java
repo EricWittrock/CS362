@@ -6,9 +6,9 @@ public class StreamingCompany implements DatabaseObject {
     private String companyName;
     private int companyId = 0;
     private ArrayList<Event> purchasedEvents;
+    private MediaContract contract;
 
     public StreamingCompany() {
-        this.purchasedEvents = new ArrayList<Event>();
     }
 
     public StreamingCompany(String companyName){
@@ -16,7 +16,7 @@ public class StreamingCompany implements DatabaseObject {
         companyId += 1;
         purchasedEvents = new ArrayList<Event>();
 
-        DataCache.addStreamingCompany(this);
+        DataCache.addObject(this);
     }
 
     public String getCompanyName(){
@@ -27,6 +27,16 @@ public class StreamingCompany implements DatabaseObject {
         return purchasedEvents;
     }
 
+    public MediaContract getContract()
+    {
+        return contract;
+    }
+
+    public void setContract(MediaContract contract)
+    {
+        this.contract = contract;
+    }
+
 	@Override
 	public int getId() {
 		return companyId;
@@ -34,7 +44,7 @@ public class StreamingCompany implements DatabaseObject {
 
 	@Override
 	public String serialize() {
-        return "Company ID: " + companyId + ", Streaming Company: " + companyName;
+        return companyId + ", " + companyName;
 	}
 
 	@Override

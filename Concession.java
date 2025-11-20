@@ -15,7 +15,7 @@ public class Concession implements DatabaseObject {
         this.amount = amount;
         this.expirationDate = expirationDate;
         this.venue = venue;
-        DataCache.addConcession(this);
+        DataCache.addObject(this);
     }
 
     public void println() {
@@ -55,10 +55,10 @@ public class Concession implements DatabaseObject {
     @Override
     public void deserialize(String data) {
         String[] parts = data.split(",");
-        this.id = Integer.parseInt(parts[0]);
-        this.name = parts[1];
-        this.amount = Integer.parseInt(parts[2]);
-        this.expirationDate = parts[3];
-        this.venue = DataCache.getVenueById(Integer.parseInt(parts[4]));
+        this.id = Integer.parseInt(parts[0].trim());
+        this.name = parts[1].trim();
+        this.amount = Integer.parseInt(parts[2].trim());
+        this.expirationDate = parts[3].trim();
+        this.venue = DataCache.getById(Integer.parseInt(parts[4].trim()), Venue::new);
     }
 }

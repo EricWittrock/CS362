@@ -24,7 +24,7 @@ public class Contract implements DatabaseObject {
         return contractId;
     }
 
-    public int getWrestlerById() {
+    public int getWrestlerId() {
         return wrestlerId;
     }
 

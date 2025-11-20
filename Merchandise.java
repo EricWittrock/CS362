@@ -2,34 +2,59 @@ public class Merchandise implements DatabaseObject
 {
     private int id = 0;
     private String name;
-    private int price;
-    private int quantity;
+    private MerchType type;
+    private int unitPrice;
+    private String supplier;
 
-    public Merchandise(String name, int price)
+    public Merchandise(){}
+    
+    public Merchandise(String name, MerchType type, int unitPrice)
     {
         id++;
         this.name = name;
-        this.price = price;
+        this.type = type;
+        this.unitPrice = unitPrice;
+        DataCache.addObject(this);
     }
 
-    public int getPrice()
-    {
-        return price;
+    public int getUnitPrice(){
+        return unitPrice;
     }
-
-    public int getQuantity()
-    {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity)
-    {
-        this.quantity = quantity;
-    }
-
+    
     public String getName()
     {
         return name;
+    }
+
+    public MerchType getType()
+    {
+        return type;
+    }
+
+    public String getSupplier(){
+        return supplier;
+    }
+
+    public void setSupplier(String supplier)
+    {
+        this.supplier = supplier;
+    }
+
+    public String print()
+    {
+        return id + " " + name + "\n" + unitPrice;
+    }
+
+    public static MerchType getMerchTypeFromString(String name)
+    {
+        for (MerchType type : MerchType.values())
+        {
+            if(type.toString().equalsIgnoreCase(name.trim()))
+            {
+                return type;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -39,7 +64,7 @@ public class Merchandise implements DatabaseObject
 
     @Override
     public String serialize(){
-        return id + "," + name + "," + price; 
+        return id + "," + name  + "," + type.toString() + "," + unitPrice + "," + supplier; 
     };
 
     @Override
@@ -47,7 +72,8 @@ public class Merchandise implements DatabaseObject
         String[] parts = data.split(",");
         this.id = Integer.parseInt(parts[0]);
         this.name = parts[1];
-        this.price = Integer.parseInt(parts[2]);
-    };
-
+        this.type = getMerchTypeFromString(parts[2]);
+        this.unitPrice = Integer.parseInt(parts[3]);
+        this.supplier = parts[4];
+    }
 }

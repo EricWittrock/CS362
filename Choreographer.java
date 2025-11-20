@@ -47,7 +47,7 @@ class Choreographer implements Actor {
         System.out.println("\n=== Create New Script ===");
 
         // available events
-        List<Event> events = DataCache.getAllEvents();
+        ArrayList<Event> events = DataCache.getAll(Event::new);
         if (events.isEmpty()) {
             System.out.println("No events available to create a script for.");
             return;
@@ -67,19 +67,19 @@ class Choreographer implements Actor {
         if (choice == 0) return;
         
         Event event = events.get(choice - 1);
-        int eventId = event.getEventId();
+        int eventId = event.getId();
 
         // check if script already exists for event
-        List<Script> existingScripts = DataCache.getAllScripts();
+        ArrayList<Script> existingScripts = DataCache.getAll(Script::new);
         for (Script s : existingScripts) {
-            if (s.getEventId().equals(String.valueOf(eventId)) &&
+            if (s.getEventId() == eventId &&
                 s.getStatus() == ScriptStatus.APPROVED){
                 System.out.println("Error: A script for this event already exists.");
                 return;
             }
         }
 
-        Script script = new Script(String.valueOf(eventId), choreographerName);
+        Script script = new Script(eventId, choreographerName);
 
         System.out.println("\n Script created successfully!");
         System.out.println("    Script ID: " + script.getScriptId());
@@ -90,7 +90,7 @@ class Choreographer implements Actor {
     }
 
     private void viewMyScripts() {
-        List<Script> myScripts = DataCache.getAllScripts().stream()
+        List<Script> myScripts = DataCache.getAll(Script::new).stream()
                 .filter(s -> s.getChoreographer().equals(choreographerName))
                 .collect(Collectors.toList());
 
@@ -104,7 +104,8 @@ class Choreographer implements Actor {
         System.out.println("\n" + "=".repeat(80));
 
         for (Script script : myScripts) {
-            Event event = DataCache.getEventById(Integer.parseInt(script.getEventId()));
+            Event event = DataCache.getById(script.getEventId(), Event::new);
+
             String eventName = (event != null) ? event.getLocationName() : "Event ID " + script.getEventId();
 
             System.out.println("\nScript ID: " + script.getScriptId());
@@ -126,7 +127,7 @@ class Choreographer implements Actor {
 
     private void editScript() {
         // show only scripts that can be edited
-        List<Script> myScripts = DataCache.getAllScripts().stream()
+        List<Script> myScripts = DataCache.getAll(Script::new).stream()
                 .filter(s -> s.getChoreographer().equals(choreographerName))
                 .filter(s -> s.getStatus() == ScriptStatus.PROPOSED || s.getStatus() == ScriptStatus.REQUIRES_REVISION)
                 .collect(Collectors.toList());
@@ -198,7 +199,9 @@ class Choreographer implements Actor {
     }
 
     private void viewScriptActions(Script script) {
-        List<ScriptAction> actions = DataCache.getActionsForScript(script.getScriptId());
+        List<ScriptAction> actions = DataCache.getAll(ScriptAction::new).stream()
+            .filter(a -> a.getScriptId() == script.getScriptId())
+            .collect(Collectors.toList());
 
         if (actions.isEmpty()) {
             System.out.println("\nNo actions in this script.");
@@ -245,7 +248,7 @@ class Choreographer implements Actor {
         int duration = UserInput.getIntInput(1, 180);
 
         // get wrestlers
-        List<Wrestler> allWrestlers = DataCache.getAllWrestlers();
+        List<Wrestler> allWrestlers = DataCache.getAll(Wrestler::new);
         if (allWrestlers.isEmpty()) {
             System.out.println("\nError: No wrestlers found in system. Ask Manager to add wrestlers first.");
             return;
@@ -289,7 +292,9 @@ class Choreographer implements Actor {
     }
 
     private void editAction(Script script) {
-        List<ScriptAction> actions = DataCache.getActionsForScript(script.getScriptId());
+        List<ScriptAction> actions = DataCache.getAll(ScriptAction::new).stream()
+            .filter(a -> a.getScriptId() == script.getScriptId())
+            .collect(Collectors.toList());
         
         if (actions.isEmpty()) {
             System.out.println("\nNo actions to edit.");
@@ -341,18 +346,18 @@ class Choreographer implements Actor {
                 System.out.print("\nSelect new type (1-" + types.length + "): ");
                 int typeChoice = UserInput.getIntInput(1, types.length);
                 action.setActionType(types[typeChoice - 1]);
-                System.out.println("✓ Action type updated to: " + types[typeChoice - 1]);
+                System.out.println(" Action type updated to: " + types[typeChoice - 1]);
                 break;
                 
             case 2: // Edit Description
                 System.out.print("\nEnter new description: ");
                 String newDesc = UserInput.getStringInput();
                 action.setDescription(newDesc);
-                System.out.println("✓ Description updated");
+                System.out.println("Description updated");
                 break;
                 
             case 3: // Edit Wrestlers
-                List<Wrestler> allWrestlers = DataCache.getAllWrestlers();
+                List<Wrestler> allWrestlers = DataCache.getAll(Wrestler::new);
                 if (allWrestlers.isEmpty()) {
                     System.out.println("\nError: No wrestlers found in system.");
                     return;
@@ -374,31 +379,33 @@ class Choreographer implements Actor {
                     newWrestlerIds.add(allWrestlers.get(wrestlerChoice - 1).getId());
                 }
                 action.setWrestlerIds(newWrestlerIds);
-                System.out.println("✓ Wrestlers updated");
+                System.out.println("Wrestlers updated");
                 break;
                 
             case 4: // Edit Danger Rating
                 System.out.print("\nEnter new danger rating (1-10): ");
                 int newDanger = UserInput.getIntInput(1, 10);
                 action.setDangerRating(newDanger);
-                System.out.println("✓ Danger rating updated to: " + newDanger);
+                System.out.println("Danger rating updated to: " + newDanger);
                 break;
                 
             case 5: // Edit Duration
                 System.out.print("\nEnter new duration (minutes): ");
                 int newDuration = UserInput.getIntInput(1, 180);
                 action.setDuration(newDuration);
-                System.out.println("✓ Duration updated to: " + newDuration + " minutes");
+                System.out.println("Duration updated to: " + newDuration + " minutes");
                 break;
         }
         
-        System.out.println("\n✓ Action updated successfully!");
+        System.out.println("\nAction updated successfully!");
         System.out.println("  New risk score: " + String.format("%.2f", script.calculateTotalRisk()) + "/10");
         System.out.println("  New insurance cost: $" + String.format("%.2f", script.calculateInsuranceCost()));
     }
 
     private void removeActionFromScript(Script script) {
-        List<ScriptAction> actions = DataCache.getActionsForScript(script.getScriptId());
+        List<ScriptAction> actions = DataCache.getAll(ScriptAction::new).stream()
+            .filter(a -> a.getScriptId() == script.getScriptId())
+            .collect(Collectors.toList());
 
         if (actions.isEmpty()) {
             System.out.println("\nNo actions to remove.");
@@ -420,7 +427,9 @@ class Choreographer implements Actor {
         script.removeActionId(toRemove.getActionId());
 
         // reorder remaining actions
-        List<ScriptAction> remaining = DataCache.getActionsForScript(script.getScriptId());
+        List<ScriptAction> remaining = DataCache.getAll(ScriptAction::new).stream()
+            .filter(a -> a.getScriptId() == script.getScriptId())
+            .collect(Collectors.toList());
         for (int i = 0; i < remaining.size(); i++) {
             remaining.get(i).setSequenceOrder(i + 1);
         }
@@ -432,7 +441,9 @@ class Choreographer implements Actor {
     }
 
     private void reorderActions(Script script) {
-        List<ScriptAction> actions = DataCache.getActionsForScript(script.getScriptId());
+        List<ScriptAction> actions = DataCache.getAll(ScriptAction::new).stream()
+            .filter(a -> a.getScriptId() == script.getScriptId())
+            .collect(Collectors.toList());
 
         if (actions.size() < 2) {
             System.out.println("\n Need at least 2 actions to reorder.");
@@ -473,7 +484,7 @@ class Choreographer implements Actor {
     }
 
     private void submitScriptForReview() {
-        List<Script> myScripts = DataCache.getAllScripts().stream()
+        List<Script> myScripts = DataCache.getAll(Script::new).stream()
                 .filter(s -> s.getChoreographer().equals(choreographerName))
                 .filter(s -> s.getStatus() == ScriptStatus.PROPOSED || s.getStatus() == ScriptStatus.REQUIRES_REVISION)
                 .collect(Collectors.toList());
@@ -517,7 +528,7 @@ class Choreographer implements Actor {
     }
 
     private void viewScriptDetails() {
-        List<Script> myScripts = DataCache.getAllScripts().stream()
+        List<Script> myScripts = DataCache.getAll(Script::new).stream()
                 .filter(s -> s.getChoreographer().equals(choreographerName))
                 .collect(Collectors.toList());
 
@@ -546,7 +557,7 @@ class Choreographer implements Actor {
     }
 
     private void displayScriptSummary(Script script) {
-        Event event = DataCache.getEventById(Integer.parseInt(script.getEventId()));
+        Event event = DataCache.getById(script.getEventId(), Event::new);
 
         System.out.println("\n" + "=".repeat(80));
         System.out.println("SCRIPT SUMMARY - ID: " + script.getScriptId());
@@ -578,7 +589,7 @@ class Choreographer implements Actor {
     private String getWrestlerNames(List<Integer> wrestlerIds) {
         List<String> names = new ArrayList<>();
         for (int id : wrestlerIds) {
-            Wrestler w = DataCache.getWrestlerById(id);
+            Wrestler w = DataCache.getById(id, Wrestler::new);
             if (w != null) {
                 names.add(w.getName());
             } else {

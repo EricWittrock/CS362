@@ -2,51 +2,24 @@ import java.util.ArrayList;
 
 public class Main {
 	public static void main(String[] args) {
-        DataCache.loadAll();
-
-        while (!showOptions()) ;
+        showOptions();
 
         DataCache.saveAll();
 	}
 
-    public static boolean showOptions() {
-        System.out.println("What type of user are you?");
-        System.out.println("0) Exit Program");
-        System.out.println("1) Customer");
-        System.out.println("2) Logistics Department");
-        System.out.println("3) Consumer Logistics Department");
-        System.out.println("4) Choreographer");
-        System.out.println("5) Manager");
-        System.out.println("6) Streaming Company");
-        int response = UserInput.getIntInput(0, 5);
+    public static void showOptions() {
+        OptionList options = new OptionList();
+        options.addExitOption("Exit Application");
+        options.add("Customer", () -> {new Customer().showOptions();});
+        options.add("Logistics Department", () -> {new LogisticsDep().showOptions();});
+        options.add("Consumer Logistics Department", () -> {new ConsumerLogistics().showOptions();});
+        options.add("Choreographer", () -> {new Choreographer().showOptions();});
+        options.add("Stakeholder", () -> {new Stakeholder().showOptions();});
+        options.add("Manager", () -> {new Manager().showOptions();});
+        options.add("Streaming Company", () -> {new StreamingCompanyController().showOptions();});
+        options.add("Budget Manager", () -> {new BudgetManager().showOptions();});
+        options.add("Finance Manager", () -> {new FinanceManager().showOptions();});
 
-        Actor actor;
-        switch(response) {
-            case 0:
-                return true;
-            case 1:
-                actor = new Customer();
-                break;
-            case 2:
-                actor = new LogisticsDep();
-                break;
-            case 3:
-                actor = new ConsumerLogistics();
-                break;
-            case 4:
-                actor = new Choreographer();
-                break;
-            case 5:
-                actor = new Manager();
-                break;
-            case 6:
-                actor = new StreamingCompanyController();
-                break;
-            default:
-                System.out.println("Invalid option. Exiting.");
-                return true;
-        }
-        actor.showOptions();
-        return false;
+        options.loopDisplayAndSelect("Select User Type:");
     }
 }

@@ -32,7 +32,7 @@ class Venue implements DatabaseObject {
         sections.add(vip);
         sections.add(general);
 
-        DataCache.addVenue(this);
+        DataCache.addObject(this);
     }
 
     public List<Section> getSections() {
@@ -41,6 +41,10 @@ class Venue implements DatabaseObject {
 
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getLocation() {

@@ -1,4 +1,5 @@
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.ArrayList;
 
 public class ConcessionSupplies implements Actor {
@@ -6,26 +7,15 @@ public class ConcessionSupplies implements Actor {
 
     @Override
     public void showOptions() {
-        List<Option> options = new ArrayList<>();
-        options.add(new Option("Order Concessions", this::orderSupplies));
-        options.add(new Option("View Concessions by Venue", this::viewSupplies));
-        options.add(new Option("View Concession Orders by Name", this::viewOrdersByName));
-        options.add(new Option("View Concession Orders by Supplier", this::viewOrdersBySupplier));
+        OptionList options = new OptionList();
+        options.addExitOption("Back");
+        options.add("Order Concessions", this::orderSupplies);
+        options.add("View Concessions by Venue", this::viewSupplies);
+        options.add("View Concession Orders by Buyer", this::viewOrdersByBuyer);
+        options.add("View Concession Orders by Supplier", this::viewOrdersBySupplier);
 
         int choice = 0;
-        while (true) { 
-            System.out.println("Concession Supplies Menu:");
-            System.out.println("0) Back");
-            for (int i = 0; i < options.size(); i++)
-                options.get(i).Display(i + 1);
-            choice = UserInput.getIntInput();
-            if (choice == 0) return;
-            if (choice < 1 || choice > options.size()) {
-                System.out.println("Invalid option.");
-                continue;
-            }
-            options.get(choice - 1).select();
-        }
+        options.loopDisplayAndSelect("Concession Supplies Menu");
     }
 
     public void orderSupplies() {
@@ -53,17 +43,22 @@ public class ConcessionSupplies implements Actor {
 
     public void viewSupplies() {
         selectVenue("Select venue to view concessions:");
-        List<Concession> concessions = DataCache.getConcessionByVenue(venue);
+        List<Concession> concessions = DataCache.getAll(Concession::new).stream()
+            .filter(c -> c.getVenueId() == venue.getId())
+            .collect(Collectors.toList());
         System.out.println(venue.getName() + " at " + venue.getLocation() + " Concessions:");
         for (Concession c : concessions) {
             c.println();
         }
     }
 
-    public void viewOrdersByName() {
+    public void viewOrdersByBuyer() {
         System.out.println("Enter name on orders to view: ");
         String name = UserInput.getStringInput();
-        List<ConcessionOrder> orders = DataCache.getConcessionOrderByName(name);
+        List<ConcessionOrder> orders = DataCache.getAll(ConcessionOrder::new).stream()
+            .filter(co -> co.getBuyer().equals(name))
+            .collect(Collectors.toList());
+                
         System.out.println("Concession Orders for " + name + ":");
         for (ConcessionOrder o : orders) {
             o.print();
@@ -73,7 +68,10 @@ public class ConcessionSupplies implements Actor {
     public void viewOrdersBySupplier() {
         System.out.println("Enter supplier name: ");
         String supplier = UserInput.getStringInput();
-        List<ConcessionOrder> orders = DataCache.getConcessionOrderBySupplier(supplier);
+        List<ConcessionOrder> orders = DataCache.getAllByFilter(
+            co -> co.getSupplier().equals(supplier),
+            ConcessionOrder::new
+        );
         System.out.println("Concession Orders from " + supplier + ":");
         for (ConcessionOrder o : orders) {
             o.print();
@@ -81,29 +79,16 @@ public class ConcessionSupplies implements Actor {
     }
 
     private void selectVenue(String prompt) {
-        List<Venue> venues = DataCache.getAllVenues();
-        List<Option> options = new ArrayList<>();
+        List<Venue> venues = DataCache.getAll(Venue::new);
+        OptionList options = new OptionList();
         for (Venue v : venues) {
-            options.add(new Option(
-                venue.getName() + " at " + venue.getLocation(),
+            options.add(
+                v.getName() + " at " + v.getLocation(),
                 () -> {setVenue(v);}
-            ));
+            );
         }
         int choice = 0;
-        while (true) { 
-            System.out.println(prompt);
-            for (int i = 0; i < options.size(); i++)
-                options.get(i).Display(i + 1);
-            System.out.println("Enter option number: ");
-            choice = UserInput.getIntInput();
-            if (choice == 0) return;
-            if (choice < 1 || choice > venues.size()) {
-                System.out.println("Invalid option.");
-                continue;
-            }
-            break;
-        }
-        options.get(choice - 1).select();
+        options.singleDisplayAndSelect("Select Venue");
     }
 
     private void setVenue(Venue v) {
