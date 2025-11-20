@@ -1,6 +1,3 @@
-import java.util.ArrayList;
-import java.util.List;
-
 public class ConsumerLogistics implements Actor {
     ConcessionSupplies concessionSupplies = new ConcessionSupplies();
     MerchandiseSupplies merchandiseSupplies = new MerchandiseSupplies();

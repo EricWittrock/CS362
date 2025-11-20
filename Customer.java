@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 class Customer implements Actor {
     OptionList options;
 

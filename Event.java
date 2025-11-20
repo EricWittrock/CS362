@@ -1,7 +1,5 @@
 import java.util.*;
 
-import javax.xml.crypto.Data;
-
 public class Event implements DatabaseObject {
     private int eventId;
     private String date;

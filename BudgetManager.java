@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.List;
 
 public class BudgetManager implements Actor {
@@ -57,7 +56,7 @@ public class BudgetManager implements Actor {
         String name = UserInput.getStringInput();
         System.out.print("Enter Initial Funds: ");
         int funds = UserInput.getIntInput();
-        Budget newBudget = new Budget(name, funds);
+        new Budget(name, funds);
         System.out.println("Created budget for " + name + " with $" + funds);
     }
 

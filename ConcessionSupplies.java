@@ -1,11 +1,9 @@
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.ArrayList;
 
-public class ConcessionSupplies implements Actor {
+public class ConcessionSupplies {
     Venue venue;
 
-    @Override
     public void showOptions() {
         OptionList options = new OptionList();
         options.addExitOption("Back");
@@ -14,7 +12,6 @@ public class ConcessionSupplies implements Actor {
         options.add("View Concession Orders by Buyer", this::viewOrdersByBuyer);
         options.add("View Concession Orders by Supplier", this::viewOrdersBySupplier);
 
-        int choice = 0;
         options.loopDisplayAndSelect("Concession Supplies Menu");
     }
 
@@ -38,7 +35,7 @@ public class ConcessionSupplies implements Actor {
         selectVenue("Select venue for concession order:");
         
         Concession concession = new Concession(name, quantity, expirationDate, venue);
-        ConcessionOrder order = new ConcessionOrder(concession, unitPrice, orderDate, orderer, supplier);
+        new ConcessionOrder(concession, unitPrice, orderDate, orderer, supplier);
     }
 
     public void viewSupplies() {
@@ -87,7 +84,6 @@ public class ConcessionSupplies implements Actor {
                 () -> {setVenue(v);}
             );
         }
-        int choice = 0;
         options.singleDisplayAndSelect("Select Venue");
     }
 

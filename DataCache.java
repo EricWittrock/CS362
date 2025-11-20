@@ -1,12 +1,6 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.function.Predicate;
@@ -103,7 +97,6 @@ class DataCache {
 
     public static <T extends DatabaseObject> ArrayList<T> getAll(Supplier<T> factory) {
         applyChangesToDBCache();
-        T obj2 = factory.get();
         String className = factory.get().getClass().getSimpleName();
         String tablePath = getTablePath(className);
         if (tablePath == null) {
