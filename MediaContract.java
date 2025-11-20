@@ -78,16 +78,6 @@ public class MediaContract implements DatabaseObject
         return status.equals(ScriptStatus.APPROVED);
     }
 
-    public void acceptContract()
-    {
-        status = ScriptStatus.APPROVED;
-    }
-
-    public void rejectContract()
-    {
-        status = ScriptStatus.REJECTED;
-    }
-
     public boolean isExpired() {
         return System.currentTimeMillis() > endDate;
     }

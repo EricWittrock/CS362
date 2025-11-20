@@ -6,7 +6,6 @@ public class Advertisement implements DatabaseObject
     private String adContents;
     private StreamingCompany company;
     private MediaContract contract;
-    private Budget budget;
     private ScriptStatus status;
 
     public Advertisement(){}
@@ -36,16 +35,6 @@ public class Advertisement implements DatabaseObject
         return adContents;
     }
 
-    public Budget getBudget()
-    {
-        return budget;
-    }
-
-    public void setBudget(Budget budget)
-    {
-        this.budget = budget;
-    }
-
     public ScriptStatus getStatus()
     {
         return status;
@@ -61,7 +50,6 @@ public class Advertisement implements DatabaseObject
         System.out.println("Streaming Company: " + company);
         System.out.println("Current Status: " + status.toString().toUpperCase());
         System.out.println("Ad Content: " + adContents);
-        System.out.println("Budget: $" + budget.getTotalBudget());
     }
 
     @Override
@@ -71,8 +59,7 @@ public class Advertisement implements DatabaseObject
 
     @Override
     public String serialize() {
-        return id + "," + company.getCompanyName()
-        + "," + budget.getTotalBudget();
+        return id + "," + company.getCompanyName();
     }
 
     @Override
@@ -81,8 +68,5 @@ public class Advertisement implements DatabaseObject
         this.id = Integer.parseInt(parts[0]);
         this.company = DataCache.getByFilter(c -> c.getCompanyName().equalsIgnoreCase(parts[1]),
             StreamingCompany::new);
-        this.budget = DataCache.getByFilter(
-            b -> b.getTotalBudget() == (Integer.parseInt(parts[2])),
-            Budget::new);
     }
 }

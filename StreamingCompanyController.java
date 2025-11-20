@@ -16,6 +16,10 @@ public class StreamingCompanyController implements Actor {
     public void suggestAdvertisement()
     {
         StreamingCompany company = getCompany();
+        if (company == null)
+        {
+            return;
+        }
         MediaContract contract = company.getContract();
         if (company.getContract() == null || !contract.getStatus().equals(ScriptStatus.APPROVED))
         {
@@ -25,24 +29,38 @@ public class StreamingCompanyController implements Actor {
         System.out.println("Enter advertisement content proposal: ");
         String adContent = UserInput.getStringInput().trim();
         Advertisement ad = new Advertisement(contract, company, adContent);
-        System.out.println("Proposed budget for ad: ");
-        int budgetNum = UserInput.getIntInput();
-        Budget budget = new Budget(adContent, budgetNum);
-        ad.setBudget(budget);
     }
 
     public void proposeContract()
     {
         StreamingCompany company = getCompany();
+        if (company == null)
+        {
+            return;
+        }
         System.out.println("Enter Desired Event ID: ");
         int eventId = UserInput.getIntInput();
         Event event = DataCache.getById(eventId, Event::new);
+        if (event == null)
+        {
+            return;
+        }
         System.out.println("Enter Desired Payment: ");
         int payment = UserInput.getIntInput();
         System.out.println("Enter Start Date: ");
         long startDate = UserInput.getLongInput();
+        if (startDate < System.currentTimeMillis())
+        {
+            System.out.println("Invalid start date.");
+            return;
+        }
         System.out.println("Enter End Date: ");
         long endDate = UserInput.getLongInput();
+        if (endDate < startDate)
+        {
+            System.out.println("Invalid end date.");
+            return;
+        }
 
         MediaContract proposedContract = new MediaContract(event, company, payment, startDate, endDate);
         company.setContract(proposedContract);
@@ -51,6 +69,10 @@ public class StreamingCompanyController implements Actor {
     public void viewMediaContract()
     {
         StreamingCompany company = getCompany();
+        if (company == null)
+        {
+            return;
+        }
         MediaContract contract = company.getContract();
         System.out.println("Media Contract Details: ");
         Event event = contract.getEvent();
@@ -67,6 +89,10 @@ public class StreamingCompanyController implements Actor {
     public void editMediaContract()
     {
         StreamingCompany company = getCompany();
+        if (company == null)
+        {
+            return;
+        }
         MediaContract contract = company.getContract();
         OptionList options = new OptionList();
         options.add("Change Event",
@@ -92,6 +118,10 @@ public class StreamingCompanyController implements Actor {
     public void submitMediaContract()
     {
         StreamingCompany company = getCompany();
+        if (company == null)
+        {
+            return;
+        }
         MediaContract contract = company.getContract();
         if (contract == null)
         {
@@ -116,7 +146,6 @@ public class StreamingCompanyController implements Actor {
         Event newEvent = DataCache.getById(choice, Event::new);
         if (newEvent == null)
         {
-            System.out.println("Event does not exist");
             return;
         }
         else if (newEvent.equals(event))

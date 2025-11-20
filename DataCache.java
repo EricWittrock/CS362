@@ -104,7 +104,7 @@ class DataCache {
     public static <T extends DatabaseObject> ArrayList<T> getAll(Supplier<T> factory) {
         applyChangesToDBCache();
         T obj2 = factory.get();
-        String className = factory.get().getClass().getSimpleName();
+        String className = obj2.getClass().getSimpleName();
         String tablePath = getTablePath(className);
         if (tablePath == null) {
             System.out.println("getAll Invalid class name: " + className);
