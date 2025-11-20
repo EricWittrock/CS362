@@ -57,16 +57,23 @@ public class StreamingCompanyController implements Actor {
         StreamingCompany company = getCompany();
         MediaContract contract = company.getContract();
         OptionList options = new OptionList();
-        options.add("Change Event", edit(contract.getEvent().getId()));
-        options.add("Change Requested Payment Amount", edit(contract.getTotalPayment()));
-        options.add("Change Start Date", edit(contract.getStartDate()));
-        options.add("Change End Date", edit(contract.getEndDate()));
+        options.add("Change Event", () -> {
+                    edit(contract.getEvent().getId());});
+        options.add("Change Requested Payment Amount", () -> {
+                    edit(contract.getTotalPayment());});
+        options.add("Change Start Date", () -> {
+                    edit(contract.getStartDate());});
+        options.add("Change End Date", () -> {
+                    edit(contract.getEndDate());});
         options.singleDisplayAndSelect("\nEdit Media Contract\nSelect Detail to Edit: ");
     }
 
     public void edit(int id)
     {
+    }
 
+    public void edit(long date)
+    {
     }
 
     private StreamingCompany getCompany()
