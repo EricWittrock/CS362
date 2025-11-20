@@ -96,15 +96,16 @@ class DataCache {
         HashMap<Integer, String> map = DBCache.get(className);
         for (String line : lines) {
             String[] parts = line.split(",", 2);
-            int id = Integer.parseInt(parts[0]);
-            map.put(id, line);
+            int id = Integer.parseInt(parts[0].trim());
+            if (!map.containsKey(id)) {
+                map.put(id, line);
+            }
         }
     }
 
     public static <T extends DatabaseObject> ArrayList<T> getAll(Supplier<T> factory) {
         applyChangesToDBCache();
-        T obj2 = factory.get();
-        String className = obj2.getClass().getSimpleName();
+        String className = factory.get().getClass().getSimpleName();
         String tablePath = getTablePath(className);
         if (tablePath == null) {
             System.out.println("getAll Invalid class name: " + className);
@@ -120,6 +121,7 @@ class DataCache {
             obj.deserialize(line);
             if (obj == null ) continue;
             objects.add(obj);
+            changedObjects.put(obj.getId(), obj);
         }
  
         return objects;
@@ -174,6 +176,7 @@ class DataCache {
             case "Budget": return "./Data/Budget.txt";
             case "Advertisement": return "./Data/Advertisement.txt";
             case "MediaContract": return "./Data/MediaContract.txt";
+            case "TravelPlan": return "./Data/TravelPlans.txt";
             default: return null;
         }
     }
