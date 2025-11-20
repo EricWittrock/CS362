@@ -101,11 +101,6 @@ public class MarketingDepartment implements Actor {
             return;
         }
         for (Advertisement advertisement : ads) {
-            if(advertisement.getContract().isExpired())
-            {
-                advertisement.setStatus(ScriptStatus.ARCHIVED);
-                ads.remove(advertisement);
-            }
             advertisement.printDetails();
         }
     }
@@ -121,12 +116,6 @@ public class MarketingDepartment implements Actor {
         OptionList options = new OptionList();
         options.addExitOption("Back");
         for (Advertisement advertisement : ads) {
-            if(advertisement.getContract().isExpired())
-            {
-                advertisement.setStatus(ScriptStatus.ARCHIVED);
-                ads.remove(advertisement);
-            }
-
             advertisement.printDetails();
             options.add(advertisement.serialize(), () -> {
                 archive(advertisement);
