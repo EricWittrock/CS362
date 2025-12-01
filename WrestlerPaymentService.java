@@ -201,7 +201,7 @@ public class WrestlerPaymentService {
     }
 
     private void displaySuccess(WrestlerPaymentBatch batch) {
-        System.out.println("\n✓ Payments processed successfully!");
+        System.out.println("\nPayments processed successfully!");
         System.out.println("  " + batch.payments.size() + " wrestlers paid");
         System.out.println("  Total disbursed: $" + batch.totalCost);
         System.out.println("\n  Note: Budget allocation handled separately");
