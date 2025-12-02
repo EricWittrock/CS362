@@ -74,6 +74,11 @@ public class StreamingCompanyController implements Actor {
             return;
         }
         MediaContract contract = company.getContract();
+        if (contract == null)
+        {
+            System.out.println("No contract exists");
+            return;
+        }
         System.out.println("Media Contract Details: ");
         Event event = contract.getEvent();
         int payment = contract.getTotalPayment();
@@ -94,6 +99,11 @@ public class StreamingCompanyController implements Actor {
             return;
         }
         MediaContract contract = company.getContract();
+        if (contract == null)
+        {
+            System.out.println("No contract exists");
+            return;
+        }
         OptionList options = new OptionList();
         options.add("Change Event",
                     () -> {
