@@ -42,9 +42,9 @@ public class Merchandise implements DatabaseObject
         this.supplier = supplier;
     }
 
-    public String print()
+    public void print()
     {
-        return id + " " + name + "\n" + unitPrice;
+        System.out.println(id + " " + name + "\n" + unitPrice);
     }
 
     public static MerchType getMerchTypeFromString(String name)

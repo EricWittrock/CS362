@@ -1,3 +1,5 @@
+import java.util.List;
+
 public class StreamingCompanyController implements Actor {
 
     @Override
@@ -20,15 +22,15 @@ public class StreamingCompanyController implements Actor {
         {
             return;
         }
-        MediaContract contract = company.getContract();
-        if (company.getContract() == null || !contract.getStatus().equals(ScriptStatus.APPROVED))
+        List<MediaContract> contract = DataCache.getAllByFilter(c -> c.getStreamingCompany().getCompanyName() == company.getCompanyName(), MediaContract::new);
+        if (contract.isEmpty() || !contract.get(0).getStatus().equals(ScriptStatus.APPROVED))
         {
             System.out.println("Cannot propose an advertisement without an approved media contract.");
             return;
         }
         System.out.println("Enter advertisement content proposal: ");
         String adContent = UserInput.getStringInput().trim();
-        Advertisement ad = new Advertisement(contract, company, adContent);
+        Advertisement ad = new Advertisement(contract.get(0), company, adContent);
     }
 
     public void proposeContract()
@@ -73,18 +75,18 @@ public class StreamingCompanyController implements Actor {
         {
             return;
         }
-        MediaContract contract = company.getContract();
-        if (contract == null)
+        List<MediaContract> contract = DataCache.getAllByFilter(c -> c.getStreamingCompany().getCompanyName() == company.getCompanyName(), MediaContract::new);
+        if (contract.size() == 0)
         {
             System.out.println("No contract exists");
             return;
         }
         System.out.println("Media Contract Details: ");
-        Event event = contract.getEvent();
-        int payment = contract.getTotalPayment();
-        long startDate = contract.getStartDate();
-        long endDate = contract.getEndDate();
-        System.out.println("Contract Status: " + contract.getStatus().toString().toUpperCase());
+        Event event = contract.get(0).getEvent();
+        int payment = contract.get(0).getTotalPayment();
+        long startDate = contract.get(0).getStartDate();
+        long endDate = contract.get(0).getEndDate();
+        System.out.println("Contract Status: " + contract.get(0).getStatus().toString().toUpperCase());
         System.out.println("Event: " + event.getId() + " at " + event.getVenue().getLocation());
         System.out.println("Payment: $" + payment);
         System.out.println("Start Date: $" + startDate);
@@ -98,8 +100,8 @@ public class StreamingCompanyController implements Actor {
         {
             return;
         }
-        MediaContract contract = company.getContract();
-        if (contract == null)
+        List<MediaContract> contract = DataCache.getAllByFilter(c -> c.getStreamingCompany().getCompanyName() == company.getCompanyName(), MediaContract::new);
+        if (contract.size() == 0)
         {
             System.out.println("No contract exists");
             return;
@@ -107,19 +109,19 @@ public class StreamingCompanyController implements Actor {
         OptionList options = new OptionList();
         options.add("Change Event",
                     () -> {
-                        changeEvent(contract.getEvent(), contract);
+                        changeEvent(contract.get(0).getEvent(), contract.get(0));
                     });
         options.add("Change Requested Payment Amount",
                     () -> {
-                        changePayment(contract.getTotalPayment(), contract);
+                        changePayment(contract.get(0).getTotalPayment(), contract.get(0));
                     });
         options.add("Change Start Date",
                     () -> {
-                        changeStartDate(contract.getStartDate(), contract);
+                        changeStartDate(contract.get(0).getStartDate(), contract.get(0));
                     });
         options.add("Change End Date",
                     () -> {
-                        changeEndDate(contract.getEndDate(), contract);
+                        changeEndDate(contract.get(0).getEndDate(), contract.get(0));
                     });
 
         options.singleDisplayAndSelect("\nEdit Media Contract\nSelect Detail to Edit: ");
@@ -132,19 +134,18 @@ public class StreamingCompanyController implements Actor {
         {
             return;
         }
-        MediaContract contract = company.getContract();
-        if (contract == null)
+        List<MediaContract> contract = DataCache.getAllByFilter(c -> c.getStreamingCompany().getCompanyName() == company.getCompanyName(), MediaContract::new);
+        if (contract.size() == 0)
         {
             System.out.println("No media contract to submit");
             return;
         }
-        else if (contract.contractAccepted())
+        else if (contract.get(0).contractAccepted())
         {
             System.out.println("Media contract already accepted");
             return;
         }
-        contract.setStatus(ScriptStatus.UNDER_REVIEW);
-        DataCache.addObject(contract);
+        contract.get(0).setStatus(ScriptStatus.UNDER_REVIEW);
         System.out.println("Media contract has been submitted.\nAwaiting approval.");
     }
 
@@ -165,7 +166,6 @@ public class StreamingCompanyController implements Actor {
         }
 
         contract.setEventCovered(newEvent);
-        DataCache.addObject(contract);
         System.out.println("Event has been updated.");
     }
 
@@ -181,7 +181,6 @@ public class StreamingCompanyController implements Actor {
             return;
         }
         contract.setTotalPayment(newPayment);
-        DataCache.addObject(contract);
         System.out.println("Payment has been updated.");
     }
 
@@ -203,7 +202,6 @@ public class StreamingCompanyController implements Actor {
             return;
         }
         contract.setStartDate(date);
-        DataCache.addObject(contract);
         System.out.println("Start Date has been updated.");
     }
 

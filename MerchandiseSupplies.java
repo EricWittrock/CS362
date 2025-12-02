@@ -3,18 +3,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class MerchandiseSupplies implements Actor {
-    private static List<MerchandiseOrder> merchandiseOrders = new ArrayList<>();
-
     @Override
     public void showOptions() {
         OptionList options = new OptionList();
         options.addExitOption("Back");
         options.add("Order Merchandise", this::orderMerchandise);
         options.add("View Merchandise By Type", this::viewMerchandiseByType);
-        options.add("View Merchandise By Supplier", this::viewMerchandiseBySupplier);
         options.add("View Merchandise Order By Venue", this::viewMerchandiseOrderByVenue);
         options.add("View Merchandise Order", this::viewOrder);
-        options.add("Remove Merchandise Order", this::removeOrder);
         
         options.loopDisplayAndSelect("\nMerchandise Supplies Menu\nEnter a number: ");
     }
@@ -60,22 +56,10 @@ public class MerchandiseSupplies implements Actor {
                 }
 
                 MerchandiseOrder order = new MerchandiseOrder(merch, quantity, venue);
-                merchandiseOrders.add(order);
                 System.out.println("Merchandise will be delivered to " + venue.getName());
                 return;
             }
         }
-    }
-
-    public void viewMerchandiseBySupplier() {
-        System.out.println("0) Back");
-        System.out.println("Enter supplier name: ");
-        String supplier = UserInput.getStringInput();
-        List<Merchandise> merchandises = DataCache.getAll(Merchandise::new).stream()
-        .filter(merch -> merch.getSupplier() == supplier)
-        .collect(Collectors.toList());
-        System.out.println("Merchandise from " + supplier + ":");
-        printMerchInfo(merchandises);
     }
 
     public void viewMerchandiseByType(){
@@ -83,14 +67,15 @@ public class MerchandiseSupplies implements Actor {
         System.out.println("Enter Type of Merchandise \n" +
         "(Accessory, Collectible, Hat, Belt, TShirt): ");
         String typeString = UserInput.getStringInput();
-        MerchType type = Merchandise.getMerchTypeFromString(typeString);
+        MerchType type = MerchType.valueOf(typeString.toUpperCase());
         if(type == null)
         {
             System.out.println("No such type.");
             return;
         }
 
-        List<Merchandise> merch = DataCache.getAll(Merchandise::new).stream()
+        List<Merchandise> merch = DataCache.getAll(Merchandise::new)
+        .stream()
         .filter(m -> m.getType() == type)
         .collect(Collectors.toList());
 
@@ -109,7 +94,9 @@ public class MerchandiseSupplies implements Actor {
     public void viewOrder() {
         System.out.println("Current Order:");
 
-        if (merchandiseOrders == null)
+        List<MerchandiseOrder> merchandiseOrders = DataCache.getAll(MerchandiseOrder::new);
+
+        if (merchandiseOrders.size() == 0)
         {
             System.out.println("No order in progress");
             return;
@@ -120,36 +107,6 @@ public class MerchandiseSupplies implements Actor {
             + "\n Supplier: " + order.getMerchandise().getSupplier() + "\n Quantity: " + order.getQuantity() 
             + "\n Unit Price: " + order.getMerchandise().getUnitPrice()
             + "\n Venue: " + order.getVenue().getName());
-        }
-    }
-
-    public void removeOrder(){
-        while (true)
-        {
-            System.out.println("Remove Merchandise Order");
-            System.out.println("0) Back");
-            System.out.println("Enter Merchandise Order ID: ");
-            int merchandiseOrderId = UserInput.getIntInput(0, merchandiseOrders.size());
-            if (merchandiseOrderId == 0)
-            {
-                return;
-            }
-
-            MerchandiseOrder order = DataCache.getById(merchandiseOrderId, MerchandiseOrder::new);
-            if (order != null && merchandiseOrders.contains(order))
-            {
-                removeOrder(merchandiseOrderId);
-                return;
-            }
-            else if (merchandiseOrders.isEmpty())
-            {
-                System.out.println("No orders in progress");
-                return;
-            }
-            else
-            {
-                System.out.println("Invalid Merchandise Order ID.");
-            }
         }
     }
 
@@ -164,9 +121,15 @@ public class MerchandiseSupplies implements Actor {
         }
         System.out.println("Merchandise Orders to be Delievered to " + venue.getName());
         List<Merchandise> venuMerchandise = new ArrayList<>();
+        List<MerchandiseOrder> merchandiseOrders = DataCache.getAll(MerchandiseOrder::new);
+        if (merchandiseOrders.size() == 0)
+        {
+            System.out.println("No order in progress");
+            return;
+        }
         for (MerchandiseOrder m : merchandiseOrders)
         {
-            if(m.getVenue().equals(venue))
+            if(m.getVenue().getId() == venueid)
             {
                 venuMerchandise.add(m.getMerchandise());
             }
@@ -175,10 +138,4 @@ public class MerchandiseSupplies implements Actor {
         printMerchInfo(venuMerchandise);
     }
 
-    private static void removeOrder(int merchandiseOrderId)
-    {
-        MerchandiseOrder remove = DataCache.getById(merchandiseOrderId, MerchandiseOrder::new);
-        merchandiseOrders.remove(remove);
-        System.out.println("Removing Merchandise Order " + merchandiseOrderId);
-    }
 }
