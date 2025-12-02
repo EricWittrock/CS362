@@ -4,16 +4,12 @@ import java.util.stream.Collectors;
 public class WorkerPayrollService {
 
     public void processWorkerPayroll() {
-        processWorkerPayrollWithReturn();
-    }
-
-    public FinanceManager.WorkerPayrollResult processWorkerPayrollWithReturn() {
         System.out.println("\n=== Process Worker Payroll ===");
 
         List<Worker> workers = DataCache.getAll(Worker::new);
         if (workers.isEmpty()) {
             System.out.println("\nNo workers in system.");
-            return new FinanceManager.WorkerPayrollResult(0, 0);
+            return;
         }
 
         String period = selectPayrollPeriod();
@@ -21,7 +17,7 @@ public class WorkerPayrollService {
 
         if (batch.paymentsByDept.isEmpty()) {
             System.out.println("\nNo workers with hours worked in this period.");
-            return new FinanceManager.WorkerPayrollResult(0, 0);
+            return;
         }
 
         displayPayrollBreakdown(batch, period);
@@ -29,10 +25,8 @@ public class WorkerPayrollService {
         if (confirmPayroll()) {
             savePayroll(batch, period);
             displaySuccess(batch);
-            return new FinanceManager.WorkerPayrollResult(batch.grandTotal, getTotalWorkerCount(batch));
+            return;
         }
-
-        return new FinanceManager.WorkerPayrollResult(0, 0);
     }
 
     private int getTotalWorkerCount(WorkerPayrollBatch batch) {

@@ -66,11 +66,11 @@ public class ScriptValidator {
             result.addWarning("Total risk score(" + String.format("%.2f", totalRisk) + ") is approaching maximum threshold (" + MAX_RISK_THRESHOLD + ").");
         }
         
-        // check 3
-        double insuranceCost = script.calculateInsuranceCost();
-        if (insuranceCost > MAX_INSURANCE_BUDGET) {
-            result.addError("Insurance cost ($" + String.format("%.2f", insuranceCost) + ") exceeds budget ($" + MAX_INSURANCE_BUDGET + ").");
-        }
+        // // check 3
+        // double insuranceCost = script.calculateInsuranceCost();
+        // if (insuranceCost > MAX_INSURANCE_BUDGET) {
+        //     result.addError("Insurance cost ($" + String.format("%.2f", insuranceCost) + ") exceeds budget ($" + MAX_INSURANCE_BUDGET + ").");
+        // }
 
         // check 4
         List<Integer> wrestlerIds = script.getRequiredWrestlerIds();

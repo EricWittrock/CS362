@@ -4,33 +4,29 @@ import java.util.stream.Collectors;
 public class WrestlerPaymentService {
 
     public void payWrestlersForEvent() {
-        payWrestlersForEventWithReturn();
-    }
-
-    public FinanceManager.WrestlerPaymentResult payWrestlersForEventWithReturn() {
-        System.out.println("\n=== Pay Wrestlers for Event ===");
+        System.out.println("=== Pay Wrestlers for Event ===");
 
         List<Event> completedEvents = getCompletedEventsWithUnpaidWrestlers();
 
         if (completedEvents.isEmpty()) {
-            System.out.println("\nNo completed events with unpaid wrestlers.");
-            return new FinanceManager.WrestlerPaymentResult(0, 0);
+            System.out.println("No completed events with unpaid wrestlers.");
+            return;
         }
 
         displayEventList(completedEvents);
 
-        System.out.print("\nSelect event (1-" + completedEvents.size() + ", 0 to cancel): ");
+        System.out.print("Select event (1-" + completedEvents.size() + ", 0 to cancel): ");
         int choice = UserInput.getIntInput(0, completedEvents.size());
 
         if (choice == 0)
             return;
 
         Event selectedEvent = completedEvents.get(choice - 1);
-        return processEventPaymentsWithReturn(selectedEvent);
+        processEventPayments(selectedEvent);
     }
 
     private void displayEventList(List<Event> events) {
-        System.out.println("\nCompleted Events:");
+        System.out.println("Completed Events:");
         for (int i = 0; i < events.size(); i++) {
             Event e = events.get(i);
             System.out.println((i + 1) + ". Event ID: " + e.getId() +
@@ -40,22 +36,18 @@ public class WrestlerPaymentService {
     }
 
     private void processEventPayments(Event event) {
-        processEventPaymentsWithReturn(event);
-    }
-
-    private FinanceManager.WrestlerPaymentResult processEventPaymentsWithReturn(Event event) {
-        System.out.println("\n--- Processing Payments for Event: " + event.getDate() + " ---");
+        System.out.println("--- Processing Payments for Event: " + event.getDate() + " ---");
 
         List<WrestlerSchedule> schedules = getSchedulesForEvent(event.getId());
         if (schedules.isEmpty()) {
-            System.out.println("\nNo wrestlers scheduled for this event.");
-            return new FinanceManager.WrestlerPaymentResult(0, 0);
+            System.out.println("No wrestlers scheduled for this event.");
+            return;
         }
 
         Script script = getApprovedScript(event.getId());
         if (script == null) {
-            System.out.println("\nError: No approved script found for this event.");
-            return new FinanceManager.WrestlerPaymentResult(0, 0);
+            System.out.println("Error: No approved script found for this event.");
+            return;
         }
 
         WrestlerPaymentBatch batch = calculatePayments(schedules, script, event.getId());
@@ -67,17 +59,14 @@ public class WrestlerPaymentService {
         }
 
         if (batch.payments.isEmpty()) {
-            System.out.println("\nNo wrestlers can be paid at this time.");
-            return new FinanceManager.WrestlerPaymentResult(0, 0);
+            System.out.println("No wrestlers can be paid at this time.");
+            return;
         }
 
         if (confirmPayment()) {
             savePayments(batch.payments, event.getId());
             displaySuccess(batch);
-            return new FinanceManager.WrestlerPaymentResult(batch.totalCost, batch.payments.size());
         }
-
-        return new FinanceManager.WrestlerPaymentResult(0, 0);
     }
 
     private WrestlerPaymentBatch calculatePayments(List<WrestlerSchedule> schedules,
@@ -162,12 +151,12 @@ public class WrestlerPaymentService {
     }
 
     private void displayPaymentBreakdown(WrestlerPaymentBatch batch) {
-        System.out.println("\n" + "=".repeat(80));
+        System.out.println("" + "=".repeat(80));
         System.out.println("PAYMENT BREAKDOWN");
         System.out.println("=".repeat(80));
 
         for (WrestlerPaymentInfo info : batch.payments) {
-            System.out.println("\n" + info.wrestler.getName());
+            System.out.println("" + info.wrestler.getName());
             System.out.println("  Base Pay: $" + info.basePay);
             System.out.println("  Bonuses: $" + info.bonusAmount +
                     " (" + info.highRiskCount + " high-risk actions)");
@@ -175,20 +164,20 @@ public class WrestlerPaymentService {
             System.out.println("  TOTAL: $" + info.totalPay);
         }
 
-        System.out.println("\n" + "=".repeat(80));
+        System.out.println("" + "=".repeat(80));
         System.out.println("GRAND TOTAL: $" + batch.totalCost);
         System.out.println("=".repeat(80));
     }
 
     private void displayErrors(List<String> errors) {
-        System.out.println("\n⚠ ERRORS - The following wrestlers cannot be paid:");
+        System.out.println("⚠ ERRORS - The following wrestlers cannot be paid:");
         for (String error : errors) {
             System.out.println("  - " + error);
         }
     }
 
     private boolean confirmPayment() {
-        System.out.print("\nConfirm payment? (yes/no): ");
+        System.out.print("Confirm payment? (yes/no): ");
         String confirm = UserInput.getStringInput();
         return confirm.equalsIgnoreCase("yes");
     }
@@ -218,10 +207,10 @@ public class WrestlerPaymentService {
     }
 
     private void displaySuccess(WrestlerPaymentBatch batch) {
-        System.out.println("\nPayments processed successfully!");
+        System.out.println("✓ Payments processed successfully!");
         System.out.println("  " + batch.payments.size() + " wrestlers paid");
         System.out.println("  Total disbursed: $" + batch.totalCost);
-        System.out.println("\n  Note: Budget allocation handled separately");
+        System.out.println("  Note: Budget allocation handled separately");
     }
 
     // Helper methods
