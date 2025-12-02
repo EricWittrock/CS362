@@ -1,3 +1,4 @@
+import java.util.Date;
 import java.util.Random;
 
 public class MediaContract implements DatabaseObject
@@ -85,8 +86,8 @@ public class MediaContract implements DatabaseObject
     public void printDetails()
     {
         System.out.println("Streaming Company: " + contractedCompany.getCompanyName());
-        System.out.println("Start Date: " + startDate);
-        System.out.println("End Date: " + endDate);
+        System.out.println("Start Date: " + new Date(startDate));
+        System.out.println("End Date: " + new Date(endDate));
         System.out.println("Total Payment: " + totalPayment);
         System.out.println("EventID to Cover: " + eventCovered.getId());
         System.out.println("Current Status: " + status.toString().toUpperCase());
@@ -100,7 +101,7 @@ public class MediaContract implements DatabaseObject
     @Override
     public String serialize() {
         return id + "," + eventCovered.getId() + "," + contractedCompany.getCompanyName()
-        + "," + totalPayment + "," + startDate + "," + endDate;
+        + "," + totalPayment + "," + startDate + "," + endDate + "," + status;
     }
 
     @Override
@@ -113,5 +114,6 @@ public class MediaContract implements DatabaseObject
         this.totalPayment = Integer.parseInt(parts[3]);
         this.startDate = Long.parseLong(parts[4]);
         this.endDate = Long.parseLong(parts[5]);
+        this.status = ScriptStatus.valueOf(parts[6]);
     }
 }

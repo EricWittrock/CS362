@@ -16,8 +16,7 @@ public class MarketingDepartment implements Actor {
     }
 
     public void viewPendingContracts() {
-        List<MediaContract> contracts = DataCache.getAllByFilter(c -> c.getStatus().
-        equals(ScriptStatus.UNDER_REVIEW) && !c.isExpired(),
+        List<MediaContract> contracts = DataCache.getAllByFilter(c -> !c.isExpired(),
                 MediaContract::new);
 
         if (contracts.isEmpty())
@@ -106,9 +105,9 @@ public class MarketingDepartment implements Actor {
     }
 
     public void archiveAdvertisements() {
-        List<Advertisement> ads = DataCache.getAllByFilter(a -> a.getStatus()
+        List<Advertisement> ads = DataCache.getAllByFilter(a -> a.getContract() != null && (a.getStatus()
         .equals(ScriptStatus.APPROVED) || a.getStatus().equals(ScriptStatus.REJECTED)
-        || a.getContract().isExpired(), Advertisement::new);
+        || a.getContract().isExpired()), Advertisement::new);
         if (ads.isEmpty())
         {
             System.out.println("No advertisement suggestions to archive.");

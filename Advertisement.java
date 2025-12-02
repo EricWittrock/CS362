@@ -47,7 +47,7 @@ public class Advertisement implements DatabaseObject
 
     public void printDetails()
     {
-        System.out.println("Streaming Company: " + company);
+        System.out.println("Streaming Company: " + company.getCompanyName());
         System.out.println("Current Status: " + status.toString().toUpperCase());
         System.out.println("Ad Content: " + adContents);
     }
@@ -59,7 +59,7 @@ public class Advertisement implements DatabaseObject
 
     @Override
     public String serialize() {
-        return id + "," + company.getCompanyName();
+        return id + "," + company.getCompanyName() + "," + adContents + "," + status;
     }
 
     @Override
@@ -68,5 +68,7 @@ public class Advertisement implements DatabaseObject
         this.id = Integer.parseInt(parts[0]);
         this.company = DataCache.getByFilter(c -> c.getCompanyName().equalsIgnoreCase(parts[1]),
             StreamingCompany::new);
+        this.adContents = parts[2];
+        this.status = ScriptStatus.valueOf(parts[3]);
     }
 }

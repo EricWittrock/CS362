@@ -15,6 +15,7 @@ public class StreamingCompany implements DatabaseObject {
         this.companyName = companyName;
         companyId += 1;
         purchasedEvents = new ArrayList<Event>();
+        contract = new MediaContract();
 
         DataCache.addObject(this);
     }
