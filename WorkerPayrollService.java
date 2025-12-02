@@ -149,11 +149,23 @@ public class WorkerPayrollService {
     }
 
     private void savePayroll(WorkerPayrollBatch batch, String period) {
+        Budget workerBudget = Budget.get("Worker");
+
         for (List<WorkerPaymentInfo> deptPayments : batch.paymentsByDept.values()) {
             for (WorkerPaymentInfo info : deptPayments) {
                 new WorkerPayment(info.worker.getWorkerId(), info.basePay, info.overtimePay,
                         info.hazardPay, info.totalHours, period);
+
+                // Charge the budget if it exists
+                if (workerBudget != null) {
+                    workerBudget.charge(info.totalPay);
+                }
             }
+        }
+
+        // Save budget changes
+        if (workerBudget != null) {
+            DataCache.addObject(workerBudget);
         }
     }
 

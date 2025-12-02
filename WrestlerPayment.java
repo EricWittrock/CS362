@@ -9,12 +9,13 @@ public class WrestlerPayment implements DatabaseObject {
     private int totalPay;
     private long paymentDate;
     private String paymentPeriod;
-    private int numHighRiskActions; 
+    private int numHighRiskActions;
 
+    public WrestlerPayment() {
+    }
 
-    public WrestlerPayment() {}
-
-    public WrestlerPayment(int wrestlerId, int eventId, int basePay, int bonusAmount, int numHighRiskActions) {
+    public WrestlerPayment(int wrestlerId, int eventId, int basePay, int bonusAmount,
+            int totalPay, int numHighRiskActions) {
         this.paymentId = new Random().nextInt(Integer.MAX_VALUE);
         this.wrestlerId = wrestlerId;
         this.eventId = eventId;
@@ -25,20 +26,46 @@ public class WrestlerPayment implements DatabaseObject {
         this.numHighRiskActions = numHighRiskActions;
 
         Event event = DataCache.getById(eventId, Event::new);
-        this.paymentPeriod = event != null ? "Event on " + event.getDate() : "Event ID" + eventId;
+        this.paymentPeriod = event != null ? "Event on " + event.getDate() : "Event ID " + eventId;
 
         DataCache.addObject(this);
     }
 
-    public int getPaymentId() { return paymentId; }
-    public int getWrestlerId() { return wrestlerId; }
-    public int getEventId() { return eventId; }
-    public int getBasePay() { return basePay; }
-    public int getBonusAmount() { return bonusAmount; }
-    public int getTotalPay() { return totalPay; }
-    public long getPaymentDate() { return paymentDate; }
-    public String getPaymentPeriod() { return paymentPeriod; }
-    public int getNumHighRiskActions() { return numHighRiskActions; }
+    public int getPaymentId() {
+        return paymentId;
+    }
+
+    public int getWrestlerId() {
+        return wrestlerId;
+    }
+
+    public int getEventId() {
+        return eventId;
+    }
+
+    public int getBasePay() {
+        return basePay;
+    }
+
+    public int getBonusAmount() {
+        return bonusAmount;
+    }
+
+    public int getTotalPay() {
+        return totalPay;
+    }
+
+    public long getPaymentDate() {
+        return paymentDate;
+    }
+
+    public String getPaymentPeriod() {
+        return paymentPeriod;
+    }
+
+    public int getNumHighRiskActions() {
+        return numHighRiskActions;
+    }
 
     @Override
     public int getId() {
@@ -47,9 +74,9 @@ public class WrestlerPayment implements DatabaseObject {
 
     @Override
     public String serialize() {
-        return paymentId + "," + wrestlerId + "," + eventId + "," + 
-               basePay + "," + bonusAmount + "," + totalPay + "," + 
-               paymentDate + "," + paymentPeriod + "," + numHighRiskActions;
+        return paymentId + "," + wrestlerId + "," + eventId + "," +
+                basePay + "," + bonusAmount + "," + totalPay + "," +
+                paymentDate + "," + paymentPeriod + "," + numHighRiskActions;
     }
 
     @Override
@@ -67,4 +94,3 @@ public class WrestlerPayment implements DatabaseObject {
     }
 
 }
-

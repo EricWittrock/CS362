@@ -69,7 +69,7 @@ public class Contract implements DatabaseObject {
 
     @Override
     public void deserialize(String data) {
-        String[] parts = data.split(",", 6);
+        String[] parts = data.split("\\,", 6);
         this.contractId = Integer.parseInt(parts[0]);
         this.wrestlerId = Integer.parseInt(parts[1]);
         this.basePay = Integer.parseInt(parts[2]);

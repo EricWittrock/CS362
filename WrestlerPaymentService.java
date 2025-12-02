@@ -23,7 +23,7 @@ public class WrestlerPaymentService {
         int choice = UserInput.getIntInput(0, completedEvents.size());
 
         if (choice == 0)
-            return new FinanceManager.WrestlerPaymentResult(0, 0);
+            return;
 
         Event selectedEvent = completedEvents.get(choice - 1);
         return processEventPaymentsWithReturn(selectedEvent);
@@ -194,9 +194,26 @@ public class WrestlerPaymentService {
     }
 
     private void savePayments(List<WrestlerPaymentInfo> payments, int eventId) {
+        Budget wrestlerBudget = Budget.get("Wrestler");
+
         for (WrestlerPaymentInfo info : payments) {
-            new WrestlerPayment(info.wrestler.getId(), eventId,
-                    info.basePay, info.bonusAmount, info.highRiskCount);
+            new WrestlerPayment(
+                    info.wrestler.getId(),
+                    eventId,
+                    info.basePay,
+                    info.bonusAmount,
+                    info.totalPay,
+                    info.highRiskCount);
+
+            // Charge the budget if it exists
+            if (wrestlerBudget != null) {
+                wrestlerBudget.charge(info.totalPay);
+            }
+        }
+
+        // Save budget changes
+        if (wrestlerBudget != null) {
+            DataCache.addObject(wrestlerBudget);
         }
     }
 

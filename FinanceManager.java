@@ -21,7 +21,7 @@ public class FinanceManager implements Actor {
             System.out.println("2: Process Worker Payroll");
             System.out.println("3: View Wrestler Payment History");
             System.out.println("4: View Worker Payment History");
-            System.out.println("5: Manage Funds");
+            System.out.println("5: View Payment Budgets");
             System.out.print("\nEnter choice: ");
             int choice = UserInput.getIntInput(0, 5);
 
@@ -36,37 +36,40 @@ public class FinanceManager implements Actor {
             } else if (choice == 4) {
                 historyService.viewWorkerPaymentHistory();
             } else if (choice == 5) {
-                fundsController.showOptions();
+                viewPaymentBudgets();
             }
         }
     }
 
     private void payWrestlersForEvent() {
+        Budget wrestlerBudget = Budget.get("Wrestler");
+        if (wrestlerBudget == null) {
+            System.out.println("(Note: No 'Wrestler' budget set up)");
+        }
         wrestlerPaymentService.payWrestlersForEvent();
     }
 
     private void processWorkerPayroll() {
+        Budget workerBudget = Budget.get("Worker");
+        if (workerBudget == null) {
+            System.out.println("(Note: No 'Worker' budget set up)");
+        }
         workerPayrollService.processWorkerPayroll();
     }
 
-    // Helper classes for payment services
-    public static class WrestlerPaymentResult {
-        public int totalPaid;
-        public int wrestlerCount;
-
-        public WrestlerPaymentResult(int totalPaid, int wrestlerCount) {
-            this.totalPaid = totalPaid;
-            this.wrestlerCount = wrestlerCount;
+    private void viewPaymentBudgets() {
+        System.out.println("\n=== Payment Budgets ===");
+        Budget wrestlerBudget = Budget.get("Wrestler");
+        Budget workerBudget = Budget.get("Worker");
+        if (wrestlerBudget != null) {
+            wrestlerBudget.print();
+        } else {
+            System.out.println("Wrestler Budget: Not configured");
         }
-    }
-
-    public static class WorkerPayrollResult {
-        public int totalPaid;
-        public int workerCount;
-
-        public WorkerPayrollResult(int totalPaid, int workerCount) {
-            this.totalPaid = totalPaid;
-            this.workerCount = workerCount;
+        if (workerBudget != null) {
+            workerBudget.print();
+        } else {
+            System.out.println("Worker Budget: Not configured");
         }
     }
 }
