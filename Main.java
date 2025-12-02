@@ -15,6 +15,7 @@ public class Main {
         options.add("Choreographer", () -> {new Choreographer().showOptions();});
         options.add("Stakeholder", () -> {new Stakeholder().showOptions();});
         options.add("Manager", () -> {new Manager().showOptions();});
+        options.add("Worker Manager", () -> {new WorkerManager().showOptions();});
         options.add("Streaming Company", () -> {new StreamingCompanyController().showOptions();});
         options.add("Budget Manager", () -> {new BudgetManager().showOptions();});
         options.add("Finance Manager", () -> {new FinanceManager().showOptions();});

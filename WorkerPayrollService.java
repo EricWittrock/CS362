@@ -25,7 +25,14 @@ public class WorkerPayrollService {
         if (confirmPayroll()) {
             savePayroll(batch, period);
             displaySuccess(batch);
+            return;
         }
+    }
+
+    private int getTotalWorkerCount(WorkerPayrollBatch batch) {
+        return batch.paymentsByDept.values().stream()
+                .mapToInt(dept -> dept.size())
+                .sum();
     }
 
     private String selectPayrollPeriod() {
@@ -57,11 +64,12 @@ public class WorkerPayrollService {
             }
 
             WorkerPaymentInfo paymentInfo = calculateWorkerPayment(worker, period);
-            if (paymentInfo == null) continue; // No hours worked
+            if (paymentInfo == null)
+                continue; // No hours worked
 
             batch.paymentsByDept
-                .computeIfAbsent(worker.getDepartment(), k -> new ArrayList<>())
-                .add(paymentInfo);
+                    .computeIfAbsent(worker.getDepartment(), k -> new ArrayList<>())
+                    .add(paymentInfo);
             batch.grandTotal += paymentInfo.totalPay;
         }
 
@@ -83,7 +91,8 @@ public class WorkerPayrollService {
             }
         }
 
-        if (totalHours == 0) return null;
+        if (totalHours == 0)
+            return null;
 
         int hourlyRate = worker.getHourlyRate();
         int regularHours = Math.min(totalHours, 160);
@@ -134,19 +143,31 @@ public class WorkerPayrollService {
     }
 
     private void savePayroll(WorkerPayrollBatch batch, String period) {
+        Budget workerBudget = Budget.get("Worker");
+
         for (List<WorkerPaymentInfo> deptPayments : batch.paymentsByDept.values()) {
             for (WorkerPaymentInfo info : deptPayments) {
                 new WorkerPayment(info.worker.getWorkerId(), info.basePay, info.overtimePay,
                         info.hazardPay, info.totalHours, period);
+
+                // Charge the budget if it exists
+                if (workerBudget != null) {
+                    workerBudget.charge(info.totalPay);
+                }
             }
+        }
+
+        // Save budget changes
+        if (workerBudget != null) {
+            DataCache.addObject(workerBudget);
         }
     }
 
     private void displaySuccess(WorkerPayrollBatch batch) {
         int count = batch.paymentsByDept.values().stream()
                 .mapToInt(List::size).sum();
-        
-        System.out.println("\n✓ Payroll processed successfully!");
+
+        System.out.println("\nPayroll processed successfully!");
         System.out.println("  " + count + " workers paid");
         System.out.println("  Total disbursed: $" + batch.grandTotal);
         System.out.println("\n  Note: Budget allocation handled separately");
@@ -154,8 +175,8 @@ public class WorkerPayrollService {
 
     private boolean isWorkerPaidForPeriod(int workerId, String period) {
         return DataCache.getAll(WorkerPayment::new).stream()
-                .anyMatch(p -> p.getWorkerId() == workerId && 
-                             p.getPaymentPeriod().equals(period));
+                .anyMatch(p -> p.getWorkerId() == workerId &&
+                        p.getPaymentPeriod().equals(period));
     }
 
     // Inner classes

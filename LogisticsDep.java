@@ -180,6 +180,8 @@ class LogisticsDep implements Actor {
         if (cost > budget) {
             System.out.println("Not enough budget to cover travel costs. Deleteing travel plan.");
             tp.removeEventId();
+        }else {
+            budget -= cost;
         }
     }
 
@@ -229,6 +231,8 @@ class LogisticsDep implements Actor {
                 System.out.println("Not enough budget to cover hotel costs. Please re-enter number of nights.");
             }
         } while (cost > budget);
+
+        budget -= cost;
     }
 
     private void changeHeadquartersCity() {

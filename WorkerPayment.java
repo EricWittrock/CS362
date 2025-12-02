@@ -22,7 +22,7 @@ public class WorkerPayment implements DatabaseObject {
         this.basePay = basePay;
         this.overtimePay = overtimePay;
         this.hazardPay = hazardPay;
-        this.totalPay = totalPay;
+        this.totalPay = basePay + overtimePay + hazardPay;
         this.paymentDate = System.currentTimeMillis();
         this.paymentPeriod = period;
         this.totalHours = totalHours;

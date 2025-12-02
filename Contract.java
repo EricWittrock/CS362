@@ -63,13 +63,13 @@ public class Contract implements DatabaseObject {
 
     @Override
     public String serialize() {
-        return contractId + "|" + wrestlerId + "|" + basePay + "|"
-                + startDate + "|" + endDate + "|" + isActive;
+        return contractId + "," + wrestlerId + "," + basePay + ","
+                + startDate + "," + endDate + "," + isActive;
     }
 
     @Override
     public void deserialize(String data) {
-        String[] parts = data.split("\\|", 6);
+        String[] parts = data.split("\\,", 6);
         this.contractId = Integer.parseInt(parts[0]);
         this.wrestlerId = Integer.parseInt(parts[1]);
         this.basePay = Integer.parseInt(parts[2]);

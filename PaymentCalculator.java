@@ -30,8 +30,8 @@ public class PaymentCalculator {
     }
 
     public static int calculateOvertimePay(int overtimeHours, int hourlyRate) {
-        return (overtimeHours * hourlyRate * OVERTIME_MULTIPLIER_NUMERATOR) 
-               / OVERTIME_MULTIPLIER_DENOMINATOR;
+        return (overtimeHours * hourlyRate * OVERTIME_MULTIPLIER_NUMERATOR)
+                / OVERTIME_MULTIPLIER_DENOMINATOR;
     }
 
     public static int calculateHazardPay(int hazardousHours, int hourlyRate) {
@@ -41,12 +41,13 @@ public class PaymentCalculator {
     public static boolean isHazardousEvent(Event event) {
         // Check if event has high-danger script
         Script script = DataCache.getAll(Script::new).stream()
-            .filter(s -> s.getEventId() == event.getId())
-            .filter(s -> s.getStatus() == ScriptStatus.APPROVED)
-            .findFirst()
-            .orElse(null);
-        
-        if (script == null) return false;
+                .filter(s -> s.getEventId() == event.getId())
+                .filter(s -> s.getStatus() == ScriptStatus.APPROVED)
+                .findFirst()
+                .orElse(null);
+
+        if (script == null)
+            return false;
 
         for (Integer actionId : script.getActionIds()) {
             ScriptAction action = DataCache.getById(actionId, ScriptAction::new);
