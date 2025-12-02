@@ -51,10 +51,11 @@ class DataCache {
             System.out.println("Invalid class name: " + className);
             return 1;
         }
-
+        
         if (changedObjects.containsKey(id)) {
             DatabaseObject existingObject = changedObjects.get(id);
             obj.deserialize(existingObject.serialize());
+            return 0;
         }
 
         if (!DBCache.containsKey(className)) {
@@ -69,7 +70,7 @@ class DataCache {
 
         if(!map.containsKey(id)) {
             System.out.println("ID " + id + " not found in " + className + " table.");
-            return 1; // not found
+            return 1;
         }
 
         String dbLine = map.get(id);
@@ -177,6 +178,12 @@ class DataCache {
             case "Advertisement": return "./Data/Advertisement.txt";
             case "MediaContract": return "./Data/MediaContract.txt";
             case "TravelPlan": return "./Data/TravelPlans.txt";
+            case "Worker": return "./Data/Workers.txt";
+            case "WorkerPayment": return "./Data/WorkerPayments.txt";
+            case "WrestlerPayment": return "./Data/WrestlerPayments.txt";
+            case "WorkerAssignment": return "./Data/WorkerAssignments.txt";
+            case "Contract": return "./Data/Contracts.txt";
+            case "WorkerInsurance": return "./Data/WorkerInsurances.txt";
             default: return null;
         }
     }
