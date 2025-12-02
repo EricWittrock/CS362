@@ -38,7 +38,7 @@ public class StreamingCompany implements DatabaseObject {
 
 	@Override
 	public String serialize() {
-        return companyId + "," + companyName + "," + contract.getId();
+        return companyId + "," + companyName;
 	}
 
 	@Override
@@ -46,6 +46,5 @@ public class StreamingCompany implements DatabaseObject {
         String[] parts = data.split(",", 2);
         this.companyId = Integer.parseInt(parts[0]);
         this.companyName = parts[1];
-        this.contract = parts[2].isEmpty() ? null : DataCache.getById(Integer.parseInt(parts[2]), MediaContract::new);
 	}
 }
