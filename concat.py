@@ -1,4 +1,4 @@
-# write a python script that concatenates all .java files and saves it as all.txt
+# a python script that concatenates all .java files and saves it as all.txt
 import os
 
 txt = ""
