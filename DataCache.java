@@ -70,7 +70,7 @@ class DataCache {
 
         if(!map.containsKey(id)) {
             System.out.println("ID " + id + " not found in " + className + " table.");
-            return 1;
+            return 1; // not found
         }
 
         String dbLine = map.get(id);
