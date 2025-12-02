@@ -1,2 +1,3 @@
 858436200,John,Security,15
+2014742613,res,Stage Crew,50
 266758641,joe,Stage Crew,20
