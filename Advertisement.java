@@ -59,7 +59,7 @@ public class Advertisement implements DatabaseObject
 
     @Override
     public String serialize() {
-        return id + "," + company.getCompanyName() + "," + adContents + "," + status;
+        return id + "," + company.getCompanyName() + "," + adContents + "," + status + "," + contract.getId();
     }
 
     @Override
@@ -70,5 +70,6 @@ public class Advertisement implements DatabaseObject
             StreamingCompany::new);
         this.adContents = parts[2];
         this.status = ScriptStatus.valueOf(parts[3]);
+        this.contract = DataCache.getById(Integer.parseInt(parts[4]), MediaContract::new);
     }
 }
