@@ -56,6 +56,8 @@ class LogisticsDep implements Actor {
 
         int choice = UserInput.getIntInput(0, events.size()) - 1;
 
+        System.out.println("choice #: " + choice);
+
         if (choice < 0) {
             return null;
         }

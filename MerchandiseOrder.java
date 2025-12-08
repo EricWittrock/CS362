@@ -5,16 +5,14 @@ public class MerchandiseOrder implements DatabaseObject
     private int id;
     private Merchandise merchandise;
     private int quantity;
-    private Venue venue;
 
     public MerchandiseOrder(){}
 
-    public MerchandiseOrder(Merchandise merchandise, int quantity, Venue venue)
+    public MerchandiseOrder(Merchandise merchandise, int quantity)
     {
         id = new Random().nextInt(Integer.MAX_VALUE);
         this.merchandise = merchandise;
         this.quantity = quantity;
-        this.venue = venue;
         DataCache.addObject(this);
     }
 
@@ -27,9 +25,15 @@ public class MerchandiseOrder implements DatabaseObject
         return quantity;
     }
 
-    public Venue getVenue()
+    public void print()
     {
-        return venue;
+        System.out.println("Merchandise: " + merchandise );
+        System.out.println("Unit Price: " + merchandise.getUnitPrice());
+        System.out.println("Merchandise Type: " + merchandise.getType());
+        System.out.println("Venue: " + merchandise.getVenue().getName());
+        System.out.println("Quantity: " + quantity);
+        System.out.println("Total: $" + quantity * merchandise.getUnitPrice());
+        System.out.println("---------------------------\n");
     }
 
     @Override
@@ -39,8 +43,7 @@ public class MerchandiseOrder implements DatabaseObject
 
     @Override
     public String serialize() {
-        return id + "," + merchandise.getName()
-        + "," + quantity + "," + venue.getLocation(); 
+        return id + "," + merchandise.getName() + "," + quantity; 
     }
 
     @Override
@@ -50,8 +53,6 @@ public class MerchandiseOrder implements DatabaseObject
         this.merchandise = DataCache.getByFilter(m -> m.getName()
             .equalsIgnoreCase(parts[1]), Merchandise::new);
         this.quantity = Integer.parseInt(parts[2]);
-        this.venue = DataCache.getByFilter(v -> v.getLocation()
-            .equalsIgnoreCase(parts[3]), Venue::new);
     }
     
 }

@@ -17,6 +17,7 @@ class Venue implements DatabaseObject {
 
         sections.add(vip);
         sections.add(general);
+        DataCache.addObject(this);
     }
 
     public Venue(String name, String location, int cost) {
