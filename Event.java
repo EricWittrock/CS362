@@ -52,9 +52,6 @@ public class Event implements DatabaseObject {
         int venueId = Integer.parseInt(parts[2].trim());
         
         this.venue = DataCache.getById(venueId, Venue::new);
-
-        System.out.println(venueId);
-        System.out.println(this.venue.getName());
     }
 
     @Override

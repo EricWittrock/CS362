@@ -48,6 +48,11 @@ public class ConcessionOrder implements DatabaseObject {
         return supplier;
     }
 
+    public int getUnitPrice()
+    {
+        return unitPrice;
+    }
+    
     @Override
     public int getId() {
         return id;
