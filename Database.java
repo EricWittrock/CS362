@@ -32,7 +32,7 @@ public class Database {
 
     public void overwriteAll(ArrayList<DatabaseObject> objects, String filename) {
         ensureFileExists(filename);
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filename, false))) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filename, true))) {
             for (DatabaseObject obj : objects) {
                 bw.write(obj.serialize());
                 bw.newLine();
@@ -44,7 +44,7 @@ public class Database {
 
     public void overwriteAllLines(ArrayList<String> lines, String filename) {
         ensureFileExists(filename);
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filename, false))) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filename, true))) {
             for (String line : lines) {
                 bw.write(line);
                 bw.newLine();

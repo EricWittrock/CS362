@@ -185,6 +185,7 @@ class DataCache {
             case "ScriptInsurancePayment": return "./Data/ScriptInsurancePayments.txt";
             case "Contract": return "./Data/Contracts.txt";
             case "WorkerInsurance": return "./Data/WorkerInsurances.txt";
+            case "CustomerOrder": return "./Data/CustomerOrders.txt";
             default: return null;
 
         }
