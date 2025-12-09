@@ -101,10 +101,21 @@ public class RehearsalValidator {
         if (duration < 30) {
             result.addError("Rehearsal duration must be at least 30 minutes.");
         } else if (duration > 480) {
-            result.addError("Rehearsal duration cannot exceed 8 hours (480 minutes).");
+            result.addWarning("Rehearsal duration exceeds 8 hours. This may require additional crew shifts.");
         }
 
-        // check 7
+        // check 7: Budget validation
+        Budget rehearsalBudget = Budget.get("Rehearsal");
+        if (rehearsalBudget != null) {
+            double estimatedCost = calcualteRehearsalCost(venue, duration);
+            if (rehearsalBudget.funds() < estimatedCost) {
+                result.addError("Rehearsal budget is insufficient. Required: $" +
+                               String.format("%.2f", estimatedCost) +
+                               ", Available: $" + rehearsalBudget.funds());
+            }
+        }
+
+        // check 8
         double riskScore = script.calculateTotalRisk();
         if (riskScore > 7.0) {
             result.addWarning("High risk script (risk: " + String.format("%.2f", riskScore) + "). Consider extended rehearsal time.");

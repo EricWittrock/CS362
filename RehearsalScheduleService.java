@@ -168,18 +168,28 @@ public class RehearsalScheduleService {
                 ""
         );
 
+        // charge the rehearsal budget
+        Budget rehearsalBudget = Budget.get("Rehearsal");
+        if (rehearsalBudget == null) {
+            rehearsalBudget = new Budget("Rehearsal", 100000);
+        }
+
+        rehearsalBudget.charge((int) cost);
+        DataCache.addObject(rehearsalBudget);
+
         // Notify wrestlers by adding to their schedules
         for (Integer wrestlerId : script.getRequiredWrestlerIds()) {
             new WrestlerSchedule(wrestlerId, rehearsal.getRehearsalId(), "REHEARSAL");
         }
 
         System.out.println("\n" + "=".repeat(60));
-        System.out.println("Rehearsal scheduled successfully");
+        System.out.println("REHEARSAL SCHEDULED SUCCESSFULLY!");
         System.out.println("=".repeat(60));
-
         System.out.println("Rehearsal ID: " + rehearsal.getRehearsalId());
-        System.out.println("Estimated Cost: $" + String.format("%.2f", cost));
-        System.out.println("Notified " + script.getRequiredWrestlerIds().size() + " wrestler(s) of rehearsal.");
+        System.out.println("Cost: $" + String.format("%.2f", cost));
+        System.out.println("Charged to: Rehearsal Budget");
+        System.out.println("Remaining Budget: $" + rehearsalBudget.funds());
+        System.out.println("Wrestlers will be notified of rehearsal schedule.");
         System.out.println("=".repeat(60));
     }
 
