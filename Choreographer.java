@@ -24,23 +24,47 @@ class Choreographer implements Actor {
             System.out.println("3: Edit Script");
             System.out.println("4: Submit Script for Review");
             System.out.println("5: View Script Details");
+            System.out.println("6: Schedule Rehearsal");
+            System.out.println("7: View My Rehearsals");
             System.out.print("Enter choice: ");
-            int choice = UserInput.getIntInput(0, 5);
+            int choice = UserInput.getIntInput(0, 7);
 
-            if (choice == 0) {
-                break;
-            } else if (choice == 1) {
-                createNewScript();
-            } else if (choice == 2) {
-                viewMyScripts();
-            } else if (choice == 3) {
-                editScript();
-            } else if (choice == 4) {
-                submitScriptForReview();
-            } else if (choice == 5) {
-                viewScriptDetails();
+            switch (choice) {
+                case 0:
+                    return;
+                case 1:
+                    createNewScript();
+                    break;
+                case 2:
+                    viewMyScripts();
+                    break;
+                case 3:
+                    editScript();
+                    break;
+                case 4:
+                    submitScriptForReview();
+                    break;
+                case 5:
+                    viewScriptDetails();
+                    break;
+                case 6:
+                    scheduleRehearsal();
+                    break;
+                case 7:
+                    viewRehearsals();
+                    break;
             }
         }
+    }
+
+    private void scheduleRehearsal() {
+        RehearsalScheduleService service = new RehearsalScheduleService(choreographerName);
+        service.scheduleRehearsal();
+    }
+
+    private void viewRehearsals() {
+        RehearsalScheduleService service = new RehearsalScheduleService(choreographerName);
+        service.viewRehearsals();
     }
 
     private void createNewScript() {

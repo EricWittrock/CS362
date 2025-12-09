@@ -191,6 +191,7 @@ class DataCache {
             case "EmployeeTaxRecord": return "./Data/EmployeeTaxRecords.txt";
             case "BenefitsDeduction": return "./Data/BenefitsDeductions.txt";
             case "BenefitsPlan": return "./Data/BenefitsPlans.txt";
+            case "RehearsalSession": return "./Data/RehearsalSessions.txt";
             default: return null;
 
         }

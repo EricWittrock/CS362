@@ -19,8 +19,9 @@ class Manager implements Actor {
             System.out.println("4) View Event Schedule");
             System.out.println("5) Add Wrestler Insurance");
             System.out.println("6) Add Wrestler Contract");
+            System.out.println("7) View Wrestler Rehearsals");
             System.out.print("\nEnter choice: ");
-            int choice = UserInput.getIntInput(0, 6);
+            int choice = UserInput.getIntInput(0, 7);
 
             if (choice == 0) {
                 break;
@@ -36,6 +37,8 @@ class Manager implements Actor {
                 addWrestlerInsurance();
             } else if (choice == 6) {
                 addWrestlerContract();
+            } else if (choice == 7) {
+                viewWrestlerRehearsals();
             }
         }
     }
@@ -281,5 +284,53 @@ class Manager implements Actor {
         System.out.println("  Wrestler: " + wrestler.getName());
         System.out.println("  Base Pay: $" + basePay + " per event");
         System.out.println("  Duration: " + years + " year(s)");
+    }
+
+    private void viewWrestlerRehearsals() {
+        ArrayList<Wrestler> wrestlers = DataCache.getAll(Wrestler::new);
+        
+        if (wrestlers.isEmpty()) {
+            System.out.println("\nNo wrestlers in the system.");
+            return;
+        }
+
+        System.out.println("\n--- Select Wrestler ---");
+        for (int i = 0; i < wrestlers.size(); i++) {
+            System.out.println((i + 1) + ") " + wrestlers.get(i).getName());
+        }
+        
+        System.out.print("\nEnter choice (0 to cancel): ");
+        int choice = UserInput.getIntInput(0, wrestlers.size());
+        
+        if (choice == 0) {
+            return;
+        }
+        
+        Wrestler wrestler = wrestlers.get(choice - 1);
+        ArrayList<WrestlerSchedule> allSchedules = DataCache.getAll(WrestlerSchedule::new);
+        
+        System.out.println("\nRehearsals for " + wrestler.getName() + ":");
+        System.out.println("=".repeat(60));
+        
+        boolean hasRehearsals = false;
+        for (WrestlerSchedule schedule : allSchedules) {
+            if (schedule.getWrestlerId() == wrestler.getId() && schedule.isRehearsal()) {
+                RehearsalSession rehearsal = DataCache.getById(schedule.getRehearsalId(), RehearsalSession::new);
+                if (rehearsal != null) {
+                    hasRehearsals = true;
+                    Venue venue = DataCache.getById(rehearsal.getVenueId(), Venue::new);
+                    java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm");
+                    System.out.println("Date: " + dateFormat.format(new java.util.Date(rehearsal.getScheduledDate())));
+                    System.out.println("Duration: " + rehearsal.getDuration() + " minutes");
+                    System.out.println("Venue: " + (venue != null ? venue.getName() : "Unknown"));
+                    System.out.println();
+                }
+            }
+        }
+        
+        if (!hasRehearsals) {
+            System.out.println("No rehearsals scheduled.");
+        }
+        System.out.println("=".repeat(60));
     }
 }
