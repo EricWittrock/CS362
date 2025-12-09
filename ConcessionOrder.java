@@ -3,17 +3,15 @@ import java.util.Random;
 public class ConcessionOrder implements DatabaseObject {
     private int id;
     private Concession concession;
-    private int unitPrice;
     private String orderDate;
     private String buyer;
     private String supplier;
 
     public ConcessionOrder() {}
 
-    public ConcessionOrder(Concession concession, int unitPrice, String orderDate, String ordererName, String supplier) {
+    public ConcessionOrder(Concession concession, String orderDate, String ordererName, String supplier) {
         this.id = new Random().nextInt(Integer.MAX_VALUE);
         this.concession = concession;
-        this.unitPrice = unitPrice;
         this.orderDate = orderDate;
         this.buyer = ordererName;
         this.supplier = supplier;
@@ -26,9 +24,8 @@ public class ConcessionOrder implements DatabaseObject {
         System.out.println("Order Date: " + orderDate);
         System.out.println("Concession: " + concession.getName());
         System.out.println("Expiration: " + concession.getExpirationDate());
-        System.out.println("Unit Price: $" + unitPrice);
         System.out.println("Units: " + concession.getAmount());
-        System.out.println("Total: $" + concession.getAmount()*unitPrice);
+        System.out.println("Total: $" + concession.getTotal());
         System.out.println("---------------------------\n");
     }
 
@@ -47,7 +44,7 @@ public class ConcessionOrder implements DatabaseObject {
     public String getSupplier() {
         return supplier;
     }
-
+    
     @Override
     public int getId() {
         return id;

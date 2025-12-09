@@ -3,6 +3,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class MerchandiseSupplies implements Actor {
+
+    Venue venue;
+    
     @Override
     public void showOptions() {
         OptionList options = new OptionList();
@@ -16,50 +19,32 @@ public class MerchandiseSupplies implements Actor {
     }
 
     public void orderMerchandise() {
-        OptionList options = new OptionList();
-        options.addExitOption("Back");
-        List<Merchandise> items = DataCache.getAll(Merchandise::new).stream()
-            .collect(Collectors.toList());;
+        System.out.println("Ordering Merchandise\n");
+        System.out.println("Enter Merchandise Name: ");
+        String name = UserInput.getStringInput();
+        System.out.println("Enter Merchandise Type (TSHIRT, HAT, BELT, COLLECTIBLE, ACCESSORY): ");
+        String type = UserInput.getStringInput();
+        System.out.println("Enter quantity: ");
+        int quantity = UserInput.getIntInput();
+        System.out.println("Enter unit price: ");
+        int unitPrice = UserInput.getIntInput();
 
-        for (Merchandise item : items) {
-            options.add(item.getName() +
-                    "\n Unit Price: $" + item.getUnitPrice(),
-                    () -> {
-                        chooseQuantity(item);
-                    });
-        }
+        selectVenue("Select Venue for Merchandise: ");
 
-        options.singleDisplayAndSelect("\nMerchandise\nSelect Merchandise to Order: ");
+        Merchandise merchandise = new Merchandise(name, MerchType.valueOf(type), unitPrice, venue);
+        MerchandiseOrder merchandiseOrder = new MerchandiseOrder(merchandise, quantity);
     }
 
-    private static void chooseQuantity(Merchandise item) {
-        while (true) {
-            System.out.println("0) Back");
-            System.out.println("Enter supplier name: ");
-            String supplier = UserInput.getStringInput();
-            Merchandise merch = new Merchandise(item.getName(), item.getType(), item.getUnitPrice());
-            merch.setSupplier(supplier);
-
-            System.out.println("Enter quantity: ");
-            int quantity = UserInput.getIntInput();
-            if (quantity <= 0)
-                return;
-
-            if (quantity > 0)
-            {
-                System.out.println("Enter ID of Venue to be Delivered to: ");
-                int venueId = UserInput.getIntInput();
-                Venue venue = DataCache.getById(venueId, Venue::new);
-                if(venue == null)
-                {
-                    System.out.println("Invalid venue ID.");
-                }
-
-                MerchandiseOrder order = new MerchandiseOrder(merch, quantity, venue);
-                System.out.println("Merchandise will be delivered to " + venue.getName());
-                return;
-            }
+    private void selectVenue(String prompt) {
+        List<Venue> venues = DataCache.getAll(Venue::new);
+        OptionList options = new OptionList();
+        for (Venue v : venues) {
+            options.add(
+                v.getName() + " at " + v.getLocation(),
+                () -> {this.venue = v;}
+            );
         }
+        options.singleDisplayAndSelect("Select Venue");
     }
 
     public void viewMerchandiseByType(){
@@ -80,12 +65,7 @@ public class MerchandiseSupplies implements Actor {
         .collect(Collectors.toList());
 
         System.out.println("Available Merchandise in " + typeString.toUpperCase());
-        printMerchInfo(merch);
-    }
-
-    private void printMerchInfo(List<Merchandise> merchandise)
-    {
-        for (Merchandise m : merchandise)
+        for (Merchandise m : merch)
         {
             m.print();
         }
@@ -103,39 +83,18 @@ public class MerchandiseSupplies implements Actor {
         }
 
         for (MerchandiseOrder order : merchandiseOrders) {
-            System.out.println("Merchandise: " + order.getMerchandise().getName() 
-            + "\n Supplier: " + order.getMerchandise().getSupplier() + "\n Quantity: " + order.getQuantity() 
-            + "\n Unit Price: " + order.getMerchandise().getUnitPrice()
-            + "\n Venue: " + order.getVenue().getName());
+            order.print();
         }
     }
 
-    public void viewMerchandiseOrderByVenue()  {
-        System.out.println("Enter Venue ID: ");
-        int venueid = UserInput.getIntInput();
-        Venue venue = DataCache.getById(venueid, Venue::new);
-        if(venue == null)
-        {
-            System.out.println("Invalid Venue ID");
-            return;
+    public void viewMerchandiseOrderByVenue() {
+        selectVenue("Select Venue to View Merchandise:");
+        List<Merchandise> merchandises = DataCache.getAll(Merchandise::new).stream()
+            .filter(c -> c.getVenue() == venue)
+            .collect(Collectors.toList());
+        System.out.println(venue.getName() + " at " + venue.getLocation() + " Merchandise:");
+        for (Merchandise m : merchandises) {
+            m.print();
         }
-        System.out.println("Merchandise Orders to be Delievered to " + venue.getName());
-        List<Merchandise> venuMerchandise = new ArrayList<>();
-        List<MerchandiseOrder> merchandiseOrders = DataCache.getAll(MerchandiseOrder::new);
-        if (merchandiseOrders.size() == 0)
-        {
-            System.out.println("No order in progress");
-            return;
-        }
-        for (MerchandiseOrder m : merchandiseOrders)
-        {
-            if(m.getVenue().getId() == venueid)
-            {
-                venuMerchandise.add(m.getMerchandise());
-            }
-        }
-
-        printMerchInfo(venuMerchandise);
     }
-
 }
