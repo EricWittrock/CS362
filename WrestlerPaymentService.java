@@ -184,26 +184,60 @@ public class WrestlerPaymentService {
 
     private void savePayments(List<WrestlerPaymentInfo> payments, int eventId) {
         Budget wrestlerBudget = Budget.get("Wrestler");
+        Event event = DataCache.getById(eventId, Event::new);
+
+        String eventLocation = "New York"; // default
+        if (event != null && event.getVenue() != null) {
+            eventLocation = event.getVenue().getLocation();
+        }
 
         for (WrestlerPaymentInfo info : payments) {
-            new WrestlerPayment(
+            boolean is1099 = true; // Wrestlers are contractors
+
+            WrestlerPayment payment = new WrestlerPayment(
                     info.wrestler.getId(),
                     eventId,
                     info.basePay,
                     info.bonusAmount,
                     info.totalPay,
-                    info.highRiskCount);
+                    info.highRiskCount,
+                    is1099);
 
-            // Charge the budget if it exists
+            // Calculate taxes
+            EmployeeTaxRecord taxRecord = getOrCreateTaxRecord(info.wrestler.getId());
+
+            TaxBreakdown breakdown = TaxCalculator.calculateTaxes(
+                    info.totalPay,
+                    is1099,
+                    eventLocation,
+                    taxRecord.getYtdGrossPay());
+
+            breakdown.paymentId = payment.getPaymentId();
+            DataCache.addObject(breakdown);
+
+            // Update payment with tax info
+            payment.setTaxBreakdown(breakdown.getId(), breakdown.netPay, breakdown.estSelfEmploymentTax);
+
+            // For 1099, still track for informational purposes
+            taxRecord.recordPayment(breakdown);
+
+            // Charge budget
             if (wrestlerBudget != null) {
                 wrestlerBudget.charge(info.totalPay);
             }
         }
 
-        // Save budget changes
         if (wrestlerBudget != null) {
             DataCache.addObject(wrestlerBudget);
         }
+    }
+
+    private EmployeeTaxRecord getOrCreateTaxRecord(int employeeId) {
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        EmployeeTaxRecord record = DataCache.getByFilter(
+                r -> r.getEmployeeId() == employeeId && r.getTaxYear() == currentYear,
+                EmployeeTaxRecord::new);
+        return record != null ? record : new EmployeeTaxRecord(employeeId);
     }
 
     private void displaySuccess(WrestlerPaymentBatch batch) {

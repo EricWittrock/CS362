@@ -6,15 +6,17 @@ public class Concession implements DatabaseObject {
     private int amount;
     private String expirationDate;
     private Venue venue;
+    private int unitPrice;
 
     public Concession() {}
 
-    public Concession(String name, int amount, String expirationDate, Venue venue) {
+    public Concession(String name, int amount, int unitPrice, String expirationDate, Venue venue) {
         this.id = new Random().nextInt(Integer.MAX_VALUE);
         this.name = name;
         this.amount = amount;
         this.expirationDate = expirationDate;
         this.venue = venue;
+        this.unitPrice = unitPrice;
         DataCache.addObject(this);
     }
 
@@ -42,6 +44,16 @@ public class Concession implements DatabaseObject {
         return venue.getId();
     }
 
+    public int getUnitPrice()
+    {
+        return unitPrice;
+    }
+
+    public int getTotal()
+    {
+        return amount * unitPrice;
+    }
+
     @Override
     public int getId() {
         return id;
@@ -49,7 +61,7 @@ public class Concession implements DatabaseObject {
 
     @Override
     public String serialize() {
-        return id + "," + name + "," + amount + "," + expirationDate + "," + venue.getId();
+        return id + "," + name + "," + amount + "," + expirationDate + "," + venue.getId() + "," + unitPrice;
     }
 
     @Override
@@ -60,5 +72,10 @@ public class Concession implements DatabaseObject {
         this.amount = Integer.parseInt(parts[2].trim());
         this.expirationDate = parts[3].trim();
         this.venue = DataCache.getById(Integer.parseInt(parts[4].trim()), Venue::new);
+        this.unitPrice = Integer.parseInt(parts[5].trim());
+    }
+
+    public void setAmount(int newAmount) {
+        this.amount = newAmount;
     }
 }

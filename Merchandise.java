@@ -6,16 +6,19 @@ public class Merchandise implements DatabaseObject
     private String name;
     private MerchType type;
     private int unitPrice;
-    private String supplier;
+    private Venue venue;
+    private int quantity;
 
     public Merchandise(){}
     
-    public Merchandise(String name, MerchType type, int unitPrice)
+    public Merchandise(String name, MerchType type, int unitPrice, int quantity, Venue venue)
     {
         id = new Random().nextInt(Integer.MAX_VALUE);
         this.name = name;
         this.type = type;
         this.unitPrice = unitPrice;
+        this.venue = venue;
+        this.quantity = quantity;
         DataCache.addObject(this);
     }
 
@@ -33,30 +36,22 @@ public class Merchandise implements DatabaseObject
         return type;
     }
 
-    public String getSupplier(){
-        return supplier;
+    public int getVenueId()
+    {
+        return venue.getId();
     }
 
-    public void setSupplier(String supplier)
+    public int getQuantity()
     {
-        this.supplier = supplier;
+        return quantity;
     }
 
     public void print()
     {
-        System.out.println(id + " " + name + "\n" + unitPrice);
-    }
-
-    public static MerchType getMerchTypeFromString(String name)
-    {
-        for (MerchType type : MerchType.values())
-        {
-            if(type.toString().equalsIgnoreCase(name.trim()))
-            {
-                return type;
-            }
-        }
-        return null;
+        System.out.println("Merchandise: " + name );
+        System.out.println("Unit Price: $" + unitPrice);
+        System.out.println("Merchandise Type: " + type);
+        System.out.println("---------------------------\n");
     }
 
     @Override
@@ -66,7 +61,7 @@ public class Merchandise implements DatabaseObject
 
     @Override
     public String serialize(){
-        return id + "," + name  + "," + type.toString() + "," + unitPrice + "," + supplier; 
+        return id + "," + name  + "," + type.toString() + "," + quantity + "," + unitPrice + "," + venue.getId(); 
     };
 
     @Override
@@ -74,8 +69,13 @@ public class Merchandise implements DatabaseObject
         String[] parts = data.split(",");
         this.id = Integer.parseInt(parts[0]);
         this.name = parts[1];
-        this.type = getMerchTypeFromString(parts[2]);
-        this.unitPrice = Integer.parseInt(parts[3]);
-        this.supplier = parts[4];
+        this.type = MerchType.valueOf(parts[2]);
+        this.quantity = Integer.parseInt(parts[3]);
+        this.unitPrice = Integer.parseInt(parts[4]);
+        this.venue = DataCache.getById(Integer.parseInt(parts[5].trim()), Venue::new);
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 }

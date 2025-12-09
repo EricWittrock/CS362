@@ -40,7 +40,7 @@ public class Event implements DatabaseObject {
     @Override
     public String serialize() {
         StringBuilder sb = new StringBuilder();
-        sb.append(eventId).append(",").append(date).append(",").append(venue.getId()).append("\n");
+        sb.append(eventId).append(",").append(date).append(",").append(venue.getId());
         return sb.toString();
     }
 
@@ -48,13 +48,8 @@ public class Event implements DatabaseObject {
     public void deserialize(String data) { 
         String[] parts = data.split(",", 3);
         this.eventId = Integer.parseInt(parts[0].trim());
-        this.date = parts[1].trim();
-        int venueId = Integer.parseInt(parts[2].trim());
-        
-        this.venue = DataCache.getById(venueId, Venue::new);
-
-        System.out.println(venueId);
-        System.out.println(this.venue.getName());
+        this.date = parts[1].trim();        
+        this.venue = DataCache.getById(Integer.parseInt(parts[2].trim()), Venue::new);
     }
 
     @Override

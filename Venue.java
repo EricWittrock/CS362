@@ -64,13 +64,17 @@ class Venue implements DatabaseObject {
 
     @Override
     public void deserialize(String data) {
-        String[] parts = data.split(",", 4);
+        String[] parts = data.split(",");
         int eventId = Integer.parseInt(parts[0]);
         String name = parts[1];
-        int cost = Integer.parseInt(parts[3]);
         this.id = eventId;
         this.name = name;
         this.location = parts[2];
+        this.cost = Integer.parseInt(parts[3]);
+;
+    }
+
+    public void setCost(int cost) {
         this.cost = cost;
     }
 
