@@ -10,6 +10,8 @@ public class WorkerPayment implements DatabaseObject {
     private long paymentDate;
     private String paymentPeriod;
     private int totalHours;
+    private int netPay; 
+    private int taxBreakdownId;
 
 
     public WorkerPayment() {}
@@ -40,6 +42,14 @@ public class WorkerPayment implements DatabaseObject {
     public long getPaymentDate() { return paymentDate; }
     public String getPaymentPeriod() { return paymentPeriod; }
     public int getTotalHours() { return totalHours; }
+    public int getNetPay() { return netPay; }
+    public int getTaxBreakdownId() { return taxBreakdownId; }
+
+    public void setTaxBreakdown(int taxBreakdownId, int netPay) {
+        this.taxBreakdownId = taxBreakdownId;
+        this.netPay = netPay;
+        DataCache.addObject(this);
+    }
 
     @Override
     public int getId() {
@@ -50,12 +60,13 @@ public class WorkerPayment implements DatabaseObject {
     public String serialize() {
         return paymentId + "," + workerId + "," + basePay + "," + 
                overtimePay + "," + hazardPay + "," + totalPay + "," + 
-               paymentDate + "," + paymentPeriod + "," + totalHours;
+               paymentDate + "," + paymentPeriod + "," + totalHours + "," +
+               netPay + "," + taxBreakdownId;
     }
 
     @Override
     public void deserialize(String data) {
-        String[] parts = data.split(",", 9);
+        String[] parts = data.split(",", 11);
         this.paymentId = Integer.parseInt(parts[0]);
         this.workerId = Integer.parseInt(parts[1]);
         this.basePay = Integer.parseInt(parts[2]);
@@ -65,5 +76,7 @@ public class WorkerPayment implements DatabaseObject {
         this.paymentDate = Long.parseLong(parts[6]);
         this.paymentPeriod = parts[7];
         this.totalHours = Integer.parseInt(parts[8]);
+        this.netPay = parts.length > 9 ? Integer.parseInt(parts[9]) : totalPay;
+        this.taxBreakdownId = parts.length > 10 ? Integer.parseInt(parts[10]) : 0;
     }
 }

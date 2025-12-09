@@ -145,32 +145,69 @@ public class WorkerPayrollService {
     private void savePayroll(WorkerPayrollBatch batch, String period) {
         Budget workerBudget = Budget.get("Worker");
 
+        // Get first event from period to determine location
+        String location = "New York"; // default
+        List<WorkerAssignment> assignments = DataCache.getAll(WorkerAssignment::new);
+        if (!assignments.isEmpty()) {
+            Event event = DataCache.getById(assignments.get(0).getEventId(), Event::new);
+            if (event != null) {
+                location = event.getVenue().getLocation();
+            }
+        }
+
         for (List<WorkerPaymentInfo> deptPayments : batch.paymentsByDept.values()) {
             for (WorkerPaymentInfo info : deptPayments) {
-                new WorkerPayment(info.worker.getWorkerId(), info.basePay, info.overtimePay,
-                        info.hazardPay, info.totalHours, period);
+                WorkerPayment payment = new WorkerPayment(
+                        info.worker.getWorkerId(),
+                        info.basePay,
+                        info.overtimePay,
+                        info.hazardPay,
+                        info.totalHours,
+                        period);
 
-                // Charge the budget if it exists
+                // Calculate taxes for W2 workers
+                EmployeeTaxRecord taxRecord = getOrCreateTaxRecord(info.worker.getWorkerId());
+                TaxBreakdown breakdown = TaxCalculator.calculateTaxes(
+                        info.totalPay,
+                        false, // Workers are W2
+                        location,
+                        taxRecord.getYtdGrossPay());
+                breakdown.paymentId = payment.getPaymentId();
+                DataCache.addObject(breakdown);
+
+                // Update payment with tax info
+                payment.setTaxBreakdown(breakdown.getId(), breakdown.netPay);
+
+                // Update tax record
+                taxRecord.recordPayment(breakdown);
+
+                // Charge budget
                 if (workerBudget != null) {
                     workerBudget.charge(info.totalPay);
                 }
             }
         }
 
-        // Save budget changes
         if (workerBudget != null) {
             DataCache.addObject(workerBudget);
         }
     }
 
-    private void displaySuccess(WorkerPayrollBatch batch) {
-        int count = batch.paymentsByDept.values().stream()
-                .mapToInt(List::size).sum();
+    private EmployeeTaxRecord getOrCreateTaxRecord(int employeeId) {
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        EmployeeTaxRecord record = DataCache.getByFilter(
+                r -> r.getEmployeeId() == employeeId && r.getTaxYear() == currentYear,
+                EmployeeTaxRecord::new);
+        return record != null ? record : new EmployeeTaxRecord(employeeId);
+    }
 
-        System.out.println("\nPayroll processed successfully!");
-        System.out.println("  " + count + " workers paid");
+    private void displaySuccess(WorkerPayrollBatch batch) {
+        int workerCount = batch.paymentsByDept.values().stream()
+                .mapToInt(List::size)
+                .sum();
+        System.out.println("✓ Payroll processed successfully!");
+        System.out.println("  " + workerCount + " workers paid");
         System.out.println("  Total disbursed: $" + batch.grandTotal);
-        System.out.println("\n  Note: Budget allocation handled separately");
     }
 
     private boolean isWorkerPaidForPeriod(int workerId, String period) {
