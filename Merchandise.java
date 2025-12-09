@@ -7,16 +7,18 @@ public class Merchandise implements DatabaseObject
     private MerchType type;
     private int unitPrice;
     private Venue venue;
+    private int quantity;
 
     public Merchandise(){}
     
-    public Merchandise(String name, MerchType type, int unitPrice, Venue venue)
+    public Merchandise(String name, MerchType type, int unitPrice, int quantity, Venue venue)
     {
         id = new Random().nextInt(Integer.MAX_VALUE);
         this.name = name;
         this.type = type;
         this.unitPrice = unitPrice;
         this.venue = venue;
+        this.quantity = quantity;
         DataCache.addObject(this);
     }
 
@@ -34,15 +36,20 @@ public class Merchandise implements DatabaseObject
         return type;
     }
 
-    public Venue getVenue()
+    public int getVenueId()
     {
-        return venue;
+        return venue.getId();
+    }
+
+    public int getQuantity()
+    {
+        return quantity;
     }
 
     public void print()
     {
         System.out.println("Merchandise: " + name );
-        System.out.println("Unit Price: " + unitPrice);
+        System.out.println("Unit Price: $" + unitPrice);
         System.out.println("Merchandise Type: " + type);
         System.out.println("---------------------------\n");
     }
@@ -54,7 +61,7 @@ public class Merchandise implements DatabaseObject
 
     @Override
     public String serialize(){
-        return id + "," + name  + "," + type.toString() + "," + unitPrice + "," + venue.getId(); 
+        return id + "," + name  + "," + type.toString() + "," + quantity + "," + unitPrice + "," + venue.getId(); 
     };
 
     @Override
@@ -63,7 +70,12 @@ public class Merchandise implements DatabaseObject
         this.id = Integer.parseInt(parts[0]);
         this.name = parts[1];
         this.type = MerchType.valueOf(parts[2]);
-        this.unitPrice = Integer.parseInt(parts[3]);
-        this.venue = DataCache.getById(Integer.parseInt(parts[4].trim()), Venue::new);
+        this.quantity = Integer.parseInt(parts[3]);
+        this.unitPrice = Integer.parseInt(parts[4]);
+        this.venue = DataCache.getById(Integer.parseInt(parts[5].trim()), Venue::new);
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 }

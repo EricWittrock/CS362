@@ -31,8 +31,8 @@ public class MerchandiseSupplies implements Actor {
 
         selectVenue("Select Venue for Merchandise: ");
 
-        Merchandise merchandise = new Merchandise(name, MerchType.valueOf(type), unitPrice, venue);
-        MerchandiseOrder merchandiseOrder = new MerchandiseOrder(merchandise, quantity);
+        Merchandise merchandise = new Merchandise(name, MerchType.valueOf(type.toUpperCase()), unitPrice, quantity, venue);
+        MerchandiseOrder merchandiseOrder = new MerchandiseOrder(merchandise);
     }
 
     private void selectVenue(String prompt) {
@@ -41,10 +41,15 @@ public class MerchandiseSupplies implements Actor {
         for (Venue v : venues) {
             options.add(
                 v.getName() + " at " + v.getLocation(),
-                () -> {this.venue = v;}
+                () -> {setVenue(v);}
             );
         }
+        int choice = 0;
         options.singleDisplayAndSelect("Select Venue");
+    }
+
+    private void setVenue(Venue v) {
+        this.venue = v;
     }
 
     public void viewMerchandiseByType(){
@@ -90,9 +95,9 @@ public class MerchandiseSupplies implements Actor {
     public void viewMerchandiseOrderByVenue() {
         selectVenue("Select Venue to View Merchandise:");
         List<Merchandise> merchandises = DataCache.getAll(Merchandise::new).stream()
-            .filter(c -> c.getVenue() == venue)
+            .filter(c -> c.getVenueId() == venue.getId())
             .collect(Collectors.toList());
-        System.out.println(venue.getName() + " at " + venue.getLocation() + " Merchandise:");
+        System.out.println(" Merchandise at " + venue.getName() + " in " + venue.getLocation() + ":");
         for (Merchandise m : merchandises) {
             m.print();
         }
