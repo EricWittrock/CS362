@@ -45,18 +45,19 @@ public class Section implements DatabaseObject {
 
     @Override
     public String serialize() {
-        return name + "," + numSeats + "," + price + "," + String.join(",", takenSeats.stream().map(Object::toString).toArray(String[]::new));
+        return id + "," + name + "," + numSeats + "," + price + "," + String.join(",", takenSeats.stream().map(Object::toString).toArray(String[]::new));
     }
 
     @Override
     public void deserialize(String data) {   
         String[] parts = data.split(",");
-        name = parts[0];
-        numSeats = Integer.parseInt(parts[1]);
-        price = Integer.parseInt(parts[2]);
+        id = Integer.parseInt(parts[0]);
+        name = parts[1];
+        numSeats = Integer.parseInt(parts[2]);
+        price = Integer.parseInt(parts[3]);
         takenSeats = new ArrayList<Boolean>(numSeats);
         for (int i = 0; i < numSeats; i++) {
-            takenSeats.add(parts[3 + i].equals("true"));
+            takenSeats.add(parts[4 + i].equals("true"));
         }
     }
 

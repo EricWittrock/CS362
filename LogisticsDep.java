@@ -115,6 +115,7 @@ class LogisticsDep implements Actor {
         }
 
         currentVenue.setName(venueName);
+        currentVenue.setCost(cost);
         budget -= cost;
 
         System.out.println("Venue rented: " + currentVenue.getName() + " in " + currentVenue.getLocation() + " for $" + cost);

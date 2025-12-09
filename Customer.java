@@ -7,6 +7,7 @@ class Customer implements Actor {
         options = new OptionList();
         options.addExitOption("Exit");
         options.add("Buy Ticket", () -> {TicketVendor.buyTicket();});
+        options.add("Buy Merchandise and Concession", () -> {BuyItems.buyItem();});
     }
 
     @Override
