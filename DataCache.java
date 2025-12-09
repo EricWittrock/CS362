@@ -148,6 +148,7 @@ class DataCache {
         applyChangesToDBCache();
 
         for (String className : DBCache.keySet()) {
+            loadAllDBStrings(className);
             String tablePath = getTablePath(className);
             if (tablePath == null) {
                 System.out.println("Invalid class name: " + className);
