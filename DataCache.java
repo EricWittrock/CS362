@@ -148,6 +148,7 @@ class DataCache {
         applyChangesToDBCache();
 
         for (String className : DBCache.keySet()) {
+            loadAllDBStrings(className);
             String tablePath = getTablePath(className);
             if (tablePath == null) {
                 System.out.println("Invalid class name: " + className);
@@ -185,6 +186,10 @@ class DataCache {
             case "ScriptInsurancePayment": return "./Data/ScriptInsurancePayments.txt";
             case "Contract": return "./Data/Contracts.txt";
             case "WorkerInsurance": return "./Data/WorkerInsurances.txt";
+            case "TaxBreakdown": return "./Data/TaxBreakdowns.txt";
+            case "EmployeeTaxRecord": return "./Data/EmployeeTaxRecords.txt";
+            case "BenefitsDeduction": return "./Data/BenefitsDeductions.txt";
+            case "BenefitsPlan": return "./Data/BenefitsPlans.txt";
             default: return null;
 
         }

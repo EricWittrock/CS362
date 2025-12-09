@@ -10,12 +10,16 @@ public class WrestlerPayment implements DatabaseObject {
     private long paymentDate;
     private String paymentPeriod;
     private int numHighRiskActions;
+    private boolean is1099; 
+    private int estSelfEmploymentTax; 
+    private int netPay; 
+    private int taxBreakdownId; 
 
     public WrestlerPayment() {
     }
 
     public WrestlerPayment(int wrestlerId, int eventId, int basePay, int bonusAmount,
-            int totalPay, int numHighRiskActions) {
+            int totalPay, int numHighRiskActions, boolean is1099) {
         this.paymentId = new Random().nextInt(Integer.MAX_VALUE);
         this.wrestlerId = wrestlerId;
         this.eventId = eventId;
@@ -24,10 +28,23 @@ public class WrestlerPayment implements DatabaseObject {
         this.totalPay = totalPay;
         this.paymentDate = System.currentTimeMillis();
         this.numHighRiskActions = numHighRiskActions;
+        this.is1099 = is1099;
 
         Event event = DataCache.getById(eventId, Event::new);
         this.paymentPeriod = event != null ? "Event on " + event.getDate() : "Event ID " + eventId;
 
+        DataCache.addObject(this);
+    }
+
+    public boolean is1099() { return is1099; }
+    public int getEstSelfEmploymentTax() { return estSelfEmploymentTax; }
+    public int getNetPay() { return netPay; }
+    public int getTaxBreakdownId() { return taxBreakdownId; }
+
+    public void setTaxBreakdown(int taxBreakdownId, int netPay, int estSelfEmploymentTax) {
+        this.taxBreakdownId = taxBreakdownId;
+        this.netPay = netPay;
+        this.estSelfEmploymentTax = estSelfEmploymentTax;
         DataCache.addObject(this);
     }
 
@@ -76,12 +93,13 @@ public class WrestlerPayment implements DatabaseObject {
     public String serialize() {
         return paymentId + "," + wrestlerId + "," + eventId + "," +
                 basePay + "," + bonusAmount + "," + totalPay + "," +
-                paymentDate + "," + paymentPeriod + "," + numHighRiskActions;
+                paymentDate + "," + paymentPeriod + "," + numHighRiskActions + "," +
+                is1099 + "," + estSelfEmploymentTax + "," + netPay + "," + taxBreakdownId;
     }
 
     @Override
     public void deserialize(String data) {
-        String[] parts = data.split(",", 9);
+        String[] parts = data.split(",", 13);
         this.paymentId = Integer.parseInt(parts[0]);
         this.wrestlerId = Integer.parseInt(parts[1]);
         this.eventId = Integer.parseInt(parts[2]);
@@ -91,6 +109,10 @@ public class WrestlerPayment implements DatabaseObject {
         this.paymentDate = Long.parseLong(parts[6]);
         this.paymentPeriod = parts[7];
         this.numHighRiskActions = Integer.parseInt(parts[8]);
+        this.is1099 = parts.length > 9 ? Boolean.parseBoolean(parts[9]) : true;
+        this.estSelfEmploymentTax = parts.length > 10 ? Integer.parseInt(parts[10]) : 0;
+        this.netPay = parts.length > 11 ? Integer.parseInt(parts[11]) : totalPay;
+        this.taxBreakdownId = parts.length > 12 ? Integer.parseInt(parts[12]) : 0;
     }
 
 }

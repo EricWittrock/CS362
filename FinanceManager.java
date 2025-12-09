@@ -1,3 +1,5 @@
+import java.util.*;
+
 public class FinanceManager implements Actor {
     private WrestlerPaymentService wrestlerPaymentService;
     private WorkerPayrollService workerPayrollService;
@@ -16,60 +18,102 @@ public class FinanceManager implements Actor {
         System.out.println("\n=== Finance Manager Menu ===");
 
         while (true) {
-            System.out.println("\n0: Exit");
-            System.out.println("1: Pay Wrestlers for Event");
-            System.out.println("2: Process Worker Payroll");
-            System.out.println("3: View Wrestler Payment History");
-            System.out.println("4: View Worker Payment History");
-            System.out.println("5: View Payment Budgets");
-            System.out.print("\nEnter choice: ");
-            int choice = UserInput.getIntInput(0, 5);
+            displayMenu();
+            int choice = getUserChoice();
 
-            if (choice == 0) {
+            if (choice == 0)
                 break;
-            } else if (choice == 1) {
-                payWrestlersForEvent();
-            } else if (choice == 2) {
-                processWorkerPayroll();
-            } else if (choice == 3) {
-                historyService.viewWrestlerPaymentHistory();
-            } else if (choice == 4) {
-                historyService.viewWorkerPaymentHistory();
-            } else if (choice == 5) {
-                viewPaymentBudgets();
-            }
+
+            handleMenuChoice(choice);
         }
     }
 
-    private void payWrestlersForEvent() {
-        Budget wrestlerBudget = Budget.get("Wrestler");
-        if (wrestlerBudget == null) {
-            System.out.println("(Note: No 'Wrestler' budget set up)");
+    private void displayMenu() {
+        System.out.println("\n0: Exit");
+        System.out.println("1: Pay Wrestlers for Event");
+        System.out.println("2: Process Worker Payroll");
+        System.out.println("3: View Wrestler Payment History");
+        System.out.println("4: View Worker Payment History");
+        System.out.println("5: View Payment Budgets");
+        System.out.println("6: View Employee Tax Records");
+        System.out.println("7: View Tax Breakdown by Payment");
+        System.out.println("8: Generate W2 Summary");
+        System.out.println("9: Generate 1099 Summary");
+        System.out.println("10: View Tax Liability Summary");
+        System.out.print("\nEnter choice: ");
+    }
+
+    private int getUserChoice() {
+        return UserInput.getIntInput(0, 10);
+    }
+
+    private void handleMenuChoice(int choice) {
+        switch (choice) {
+            case 1 -> payWrestlersForEvent();
+            case 2 -> processWorkerPayroll();
+            case 3 -> historyService.viewWrestlerPaymentHistory();
+            case 4 -> historyService.viewWorkerPaymentHistory();
+            case 5 -> viewPaymentBudgets();
+            case 6 -> viewEmployeeTaxRecords();
+            case 7 -> viewTaxBreakdownByPayment();
+            case 8 -> generateW2Summary();
+            case 9 -> generate1099Summary();
+            case 10 -> viewTaxLiabilitySummary();
         }
+    }
+
+    private void viewEmployeeTaxRecords() {
+        TaxReportGenerator.displayEmployeeTaxRecords();
+    }
+
+    private void viewTaxBreakdownByPayment() {
+        TaxReportGenerator.displayPaymentTaxBreakdowns();
+    }
+
+    private void generateW2Summary() {
+        TaxReportGenerator.displayW2Summary();
+    }
+
+    private void generate1099Summary() {
+        TaxReportGenerator.display1099Summary();
+    }
+
+    private void viewTaxLiabilitySummary() {
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        TaxLiabilitySummary summary = TaxService.calculateTotalLiability(currentYear);
+        summary.print();
+    }
+
+    private void payWrestlersForEvent() {
+        ensureBudgetExists("Wrestler");
         wrestlerPaymentService.payWrestlersForEvent();
     }
 
     private void processWorkerPayroll() {
-        Budget workerBudget = Budget.get("Worker");
-        if (workerBudget == null) {
-            System.out.println("(Note: No 'Worker' budget set up)");
-        }
+        ensureBudgetExists("Worker");
         workerPayrollService.processWorkerPayroll();
     }
 
     private void viewPaymentBudgets() {
-        System.out.println("\n=== Payment Budgets ===");
         Budget wrestlerBudget = Budget.get("Wrestler");
         Budget workerBudget = Budget.get("Worker");
-        if (wrestlerBudget != null) {
-            wrestlerBudget.print();
-        } else {
-            System.out.println("Wrestler Budget: Not configured");
+
+        printBudget(wrestlerBudget, "Wrestler");
+        printBudget(workerBudget, "Worker");
+    }
+
+    private void ensureBudgetExists(String budgetName) {
+        Budget budget = Budget.get(budgetName);
+        if (budget == null) {
+            System.out.println("(Note: No '" + budgetName + "' budget configured)");
         }
-        if (workerBudget != null) {
-            workerBudget.print();
+    }
+
+    private void printBudget(Budget budget, String name) {
+        if (budget != null) {
+            budget.print();
         } else {
-            System.out.println("Worker Budget: Not configured");
+            System.out.println(name + " Budget: Not configured");
         }
     }
 }
