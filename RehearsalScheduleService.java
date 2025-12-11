@@ -302,6 +302,123 @@ public class RehearsalScheduleService {
         System.out.println("=".repeat(80));
     }
 
+    public void cancelRehearsal() {
+        System.out.println("\n" + "=".repeat(60));
+        System.out.println("CANCEL REHEARSAL");
+        System.out.println("=".repeat(60));
+
+        // Get all rehearsals
+        ArrayList<RehearsalSession> allRehearsals = DataCache.getAll(RehearsalSession::new);
+        ArrayList<Script> myScripts = DataCache.getAll(Script::new);
+        Set<Integer> myScriptIds = myScripts.stream()
+            .filter(s -> s.getChoreographer().equals(choreographerName))
+            .map(Script::getScriptId)
+            .collect(Collectors.toSet());
+
+        // Filter for active rehearsals only
+        List<RehearsalSession> cancelableRehearsals = allRehearsals.stream()
+            .filter(r -> myScriptIds.contains(r.getScriptId()))
+            .filter(r -> r.getStatus() == RehearsalStatus.SCHEDULED || 
+                        r.getStatus() == RehearsalStatus.IN_PROGRESS)
+            .collect(Collectors.toList());
+
+        if (cancelableRehearsals.isEmpty()) {
+            System.out.println("\nYou have no active rehearsals to cancel.");
+            return;
+        }
+
+        System.out.println("\nYour Active Rehearsals:");
+        for (int i = 0; i < cancelableRehearsals.size(); i++) {
+            RehearsalSession r = cancelableRehearsals.get(i);
+            Script script = DataCache.getById(r.getScriptId(), Script::new);
+            Event event = DataCache.getById(r.getEventId(), Event::new);
+            Venue venue = DataCache.getById(r.getVenueId(), Venue::new);
+
+            System.out.println("\n" + (i + 1) + ". Rehearsal ID: " + r.getRehearsalId());
+            System.out.println("   Script ID: " + (script != null ? script.getScriptId() : "Unknown"));
+            System.out.println("   Event: " + (event != null ? event.getLocationName() : "Unknown"));
+            System.out.println("   Venue: " + (venue != null ? venue.getName() : "Unknown"));
+            System.out.println("   Date/Time: " + dateFormat.format(new Date(r.getScheduledDate())));
+            System.out.println("   Duration: " + r.getDuration() + " minutes");
+            System.out.println("   Cost: $" + String.format("%.2f", r.getCost()));
+            System.out.println("   Status: " + r.getStatus());
+        }
+
+        System.out.print("\nSelect rehearsal to cancel (1-" + cancelableRehearsals.size() + ", 0 to cancel): ");
+        int choice = UserInput.getIntInput(0, cancelableRehearsals.size());
+        
+        if (choice == 0) {
+            System.out.println("Cancellation aborted.");
+            return;
+        }
+
+        RehearsalSession rehearsal = cancelableRehearsals.get(choice - 1);
+
+        System.out.println("\n" + "=".repeat(60));
+        System.out.println("CANCELLATION DETAILS");
+        System.out.println("=".repeat(60));
+        System.out.println("Rehearsal ID: " + rehearsal.getRehearsalId());
+        System.out.println("Scheduled Date: " + dateFormat.format(new Date(rehearsal.getScheduledDate())));
+        System.out.println("Cost: $" + String.format("%.2f", rehearsal.getCost()));
+
+        // Calculate refund if possible (at least 48 hours notice)
+        long currentTime = System.currentTimeMillis();
+        long hoursUntilRehearsal = (rehearsal.getScheduledDate() - currentTime) / (1000 * 60 * 60);
+        int costCharged = (int) Math.ceil(rehearsal.getCost());
+        boolean eligibleForRefund = hoursUntilRehearsal >= 48;
+        int refundAmount = eligibleForRefund ? costCharged : 0;
+
+        if (eligibleForRefund) {
+            System.out.println("\nRefund Policy: Canceling with " + hoursUntilRehearsal + " hours notice.");
+            System.out.println("Full refund of $" + refundAmount + " will be issued.");
+        } else if (hoursUntilRehearsal > 0) {
+            System.out.println("\nRefund Policy: Canceling with only " + hoursUntilRehearsal + " hours notice.");
+            System.out.println("No refund available (requires 48+ hours notice).");
+        } else {
+            System.out.println("\nWarning: This rehearsal has already passed or is in progress.");
+            System.out.println("No refund available.");
+        }
+        System.out.println("=".repeat(60));
+
+        System.out.print("\nAre you sure you want to cancel this rehearsal? (yes/no): ");
+        String confirm = UserInput.getStringInput().toLowerCase();
+
+        if (!confirm.equals("yes") && !confirm.equals("y")) {
+            System.out.println("Cancellation aborted.");
+            return;
+        }
+
+        rehearsal.setStatus(RehearsalStatus.CANCELED);
+        rehearsal.setNotes("Canceled by " + choreographerName + " on " + 
+                          new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date()));
+        DataCache.addObject(rehearsal);
+
+        if (eligibleForRefund) {
+            Budget rehearsalBudget = Budget.get("Rehearsal");
+            if (rehearsalBudget != null) {
+                rehearsalBudget.refund(refundAmount);
+                DataCache.addObject(rehearsalBudget);
+            }
+        }
+
+        System.out.println("\n" + "=".repeat(60));
+        System.out.println("REHEARSAL CANCELED SUCCESSFULLY");
+        System.out.println("=".repeat(60));
+        System.out.println("Rehearsal ID: " + rehearsal.getRehearsalId());
+        System.out.println("Status: " + rehearsal.getStatus());
+        if (eligibleForRefund) {
+            System.out.println("Refund Issued: $" + refundAmount);
+            Budget rehearsalBudget = Budget.get("Rehearsal");
+            if (rehearsalBudget != null) {
+                System.out.println("Updated Budget Balance: $" + rehearsalBudget.funds());
+            }
+        } else {
+            System.out.println("Refund Issued: $0 (late cancellation)");
+        }
+        System.out.println("Wrestlers will be notified of the cancellation.");
+        System.out.println("=".repeat(60));
+    }
+
     private void displayScriptDetails(Script script) {
         Event event = DataCache.getById(script.getEventId(), Event::new);
         
