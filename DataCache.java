@@ -18,7 +18,13 @@ class DataCache {
     private static HashMap<String, HashMap<Integer, String>> DBCache = new HashMap<>();
     private static HashMap<Integer, DatabaseObject> changedObjects = new HashMap<>();
 
+    private static boolean preload_venue = false;
+
     public static <T extends DatabaseObject> T getById(int id, Supplier<T> factory) {
+        if(!preload_venue && factory.get().getClass().getSimpleName().equals("Venue")) {
+            preload_venue = true;
+            getAll(factory);
+        }
         T obj = factory.get();
         int result = populateDBObject(obj, id);
         if (result != 0) {
