@@ -7,10 +7,12 @@ import java.text.SimpleDateFormat;
 
 public class RehearsalScheduleService {
     private String choreographerName;
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+    private SimpleDateFormat dateFormat;
 
     public RehearsalScheduleService(String choreographerName) {
         this.choreographerName = choreographerName;
+        this.dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        this.dateFormat.setLenient(false);
     }
 
     public void scheduleRehearsal() {
@@ -47,6 +49,42 @@ public class RehearsalScheduleService {
         if (choice == 0) { return; }
 
         Script script = approvedScripts.get(choice - 1);
+
+        // Check if event date has already passed or if rehearsal would be after event
+        Event scriptEvent = DataCache.getById(script.getEventId(), Event::new);
+        if (scriptEvent != null) {
+            try {
+                SimpleDateFormat eventDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                eventDateFormat.setLenient(false);
+                Date eventDate = eventDateFormat.parse(scriptEvent.getDate());
+                long currentTime = System.currentTimeMillis();
+                
+                if (eventDate.getTime() < currentTime) {
+                    System.out.println("Error: Cannot schedule rehearsal for an event that has already passed.");
+                    System.out.println("Event date: " + scriptEvent.getDate());
+                    return;
+                }
+            } catch (Exception e) {
+                System.out.println("Warning: Could not validate event date format.");
+            }
+        }
+
+        // Check if rehearsal already exists for this script
+        ArrayList<RehearsalSession> existingRehearsals = DataCache.getAll(RehearsalSession::new);
+        boolean hasActiveRehearsal = existingRehearsals.stream()
+                .anyMatch(r -> r.getScriptId() == script.getScriptId() 
+                            && r.getStatus() != RehearsalStatus.CANCELED
+                            && r.getScheduledDate() > System.currentTimeMillis());
+        
+        if (hasActiveRehearsal) {
+            System.out.println("Warning: This script already has a scheduled rehearsal.");
+            System.out.print("Do you want to schedule another rehearsal? (yes/no): ");
+            String proceed = UserInput.getStringInput().toLowerCase();
+            if (!proceed.equals("yes") && !proceed.equals("y")) {
+                System.out.println("Rehearsal scheduling cancelled.");
+                return;
+            }
+        }
 
         // display script details
         displayScriptDetails(script);
@@ -95,6 +133,23 @@ public class RehearsalScheduleService {
                 System.out.println("Error: Rehearsal date must be in the future");
                 return;
             }
+
+            // check if rehearsal is scheduled after the event
+            Event eventForDateCheck = DataCache.getById(script.getEventId(), Event::new);
+            if (eventForDateCheck != null) {
+                try {
+                    SimpleDateFormat eventDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    Date eventDate = eventDateFormat.parse(eventForDateCheck.getDate());
+                    if (scheduledDate >= eventDate.getTime()) {
+                        System.out.println("Error: Rehearsal must be scheduled BEFORE the event.");
+                        System.out.println("Event date: " + eventForDateCheck.getDate());
+                        System.out.println("Rehearsal date: " + dateStr);
+                        return;
+                    }
+                } catch (Exception ex) {
+                    // if it fails, continue
+                }
+            }
         } catch (Exception e) {
             System.out.println("Error: Invalid date/time format. Please use YYYY-MM-DD for date and HH:MM");
             return;
@@ -122,8 +177,17 @@ public class RehearsalScheduleService {
 
         Venue venue = venues.get(venueChoice - 1);
 
+        // check rehearsal budget exists before validation
+        Budget rehearsalBudget = Budget.get("Rehearsal");
+        if (rehearsalBudget == null) {
+            System.out.println("Warning: Rehearsal budget does not exist. Creating default budget of $100,000.");
+            rehearsalBudget = new Budget("Rehearsal", 100000);
+            DataCache.addObject(rehearsalBudget);
+        }
+
         // calculate cost
-        double cost = RehearsalValidator.calcualteRehearsalCost(venue, duration);
+        double cost = RehearsalValidator.calculateRehearsalCost(venue, duration);
+        int costToCharge = (int) Math.ceil(cost);
 
         // summary
         System.out.println("\n" + "=".repeat(60));
@@ -134,7 +198,8 @@ public class RehearsalScheduleService {
         System.out.println("Date/Time: " + dateFormat.format(new Date(scheduledDate)));
         System.out.println("Venue: " + venue.getName() + "-" + venue.getLocation());
         System.out.println("Wrestlers: " + script.getRequiredWrestlerIds().size());
-        System.out.println("Total Cost: $" + String.format("%.2f", cost));
+        System.out.println("Estimated Cost: $" + String.format("%.2f", cost));
+        System.out.println("Amount to Charge: $" + costToCharge);
         System.out.println("=".repeat(60));
 
         System.out.println("Validating rehearsal request...");
@@ -169,12 +234,7 @@ public class RehearsalScheduleService {
         );
 
         // charge the rehearsal budget
-        Budget rehearsalBudget = Budget.get("Rehearsal");
-        if (rehearsalBudget == null) {
-            rehearsalBudget = new Budget("Rehearsal", 100000);
-        }
-
-        rehearsalBudget.charge((int) cost);
+        rehearsalBudget.charge(costToCharge);
         DataCache.addObject(rehearsalBudget);
 
         // Notify wrestlers by adding to their schedules
