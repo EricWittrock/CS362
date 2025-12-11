@@ -36,15 +36,15 @@ public class FinanceManager implements Actor {
         System.out.println("4: View Worker Payment History");
         System.out.println("5: View Payment Budgets");
         // System.out.println("6: View Employee Tax Records");
-        System.out.println("7: View Tax Breakdown by Payment");
-        System.out.println("8: Generate W2 Summary");
-        System.out.println("9: Generate 1099 Summary");
-        System.out.println("10: View Tax Liability Summary");
+        System.out.println("6: View Tax Breakdown by Payment");
+        System.out.println("7: Generate W2 Summary");
+        System.out.println("8: Generate 1099 Summary");
+        System.out.println("9: View Tax Liability Summary");
         System.out.print("\nEnter choice: ");
     }
 
     private int getUserChoice() {
-        return UserInput.getIntInput(0, 10);
+        return UserInput.getIntInput(0, 9);
     }
 
     private void handleMenuChoice(int choice) {
@@ -54,11 +54,11 @@ public class FinanceManager implements Actor {
             case 3: historyService.viewWrestlerPaymentHistory(); break;
             case 4: historyService.viewWorkerPaymentHistory(); break;
             case 5: viewPaymentBudgets(); break;
-            case 6: viewEmployeeTaxRecords(); break;
-            case 7: viewTaxBreakdownByPayment(); break;
-            case 8: generateW2Summary(); break;
-            case 9: generate1099Summary(); break;
-            case 10: viewTaxLiabilitySummary(); break;
+            // case 6: viewEmployeeTaxRecords(); break;
+            case 6: viewTaxBreakdownByPayment(); break;
+            case 7: generateW2Summary(); break;
+            case 8: generate1099Summary(); break;
+            case 9: viewTaxLiabilitySummary(); break;
         }
     }
 
