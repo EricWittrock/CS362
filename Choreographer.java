@@ -26,8 +26,9 @@ class Choreographer implements Actor {
             System.out.println("5: View Script Details");
             System.out.println("6: Schedule Rehearsal");
             System.out.println("7: View My Rehearsals");
+            System.out.println("8: Cancel Rehearsal");
             System.out.print("Enter choice: ");
-            int choice = UserInput.getIntInput(0, 7);
+            int choice = UserInput.getIntInput(0, 8);
 
             switch (choice) {
                 case 0:
@@ -53,6 +54,9 @@ class Choreographer implements Actor {
                 case 7:
                     viewRehearsals();
                     break;
+                case 8:
+                    cancelRehearsal();
+                    break;
             }
         }
     }
@@ -65,6 +69,11 @@ class Choreographer implements Actor {
     private void viewRehearsals() {
         RehearsalScheduleService service = new RehearsalScheduleService(choreographerName);
         service.viewRehearsals();
+    }
+
+    private void cancelRehearsal() {
+        RehearsalScheduleService service = new RehearsalScheduleService(choreographerName);
+        service.cancelRehearsal();
     }
 
     private void createNewScript() {

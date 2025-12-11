@@ -54,6 +54,10 @@ public class Budget implements DatabaseObject {
         remainingBudget -= amount;
     }
 
+    public void refund(int amount) {
+        remainingBudget += amount;
+    }
+
     public void print() {
         System.out.println(name + " Budget:");
         System.out.println("Total Allocated Budget: " + totalBudget);

@@ -323,6 +323,7 @@ class Manager implements Actor {
                     System.out.println("Date: " + dateFormat.format(new java.util.Date(rehearsal.getScheduledDate())));
                     System.out.println("Duration: " + rehearsal.getDuration() + " minutes");
                     System.out.println("Venue: " + (venue != null ? venue.getName() : "Unknown"));
+                    System.out.println("Status: " + rehearsal.getStatus());
                     System.out.println();
                 }
             }
