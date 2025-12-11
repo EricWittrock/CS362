@@ -77,5 +77,6 @@ public class Merchandise implements DatabaseObject
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+        DataCache.addObject(this);
     }
 }

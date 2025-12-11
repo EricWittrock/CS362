@@ -77,5 +77,6 @@ public class Concession implements DatabaseObject {
 
     public void setAmount(int newAmount) {
         this.amount = newAmount;
+        DataCache.addObject(this);
     }
 }
