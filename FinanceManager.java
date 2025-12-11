@@ -35,7 +35,7 @@ public class FinanceManager implements Actor {
         System.out.println("3: View Wrestler Payment History");
         System.out.println("4: View Worker Payment History");
         System.out.println("5: View Payment Budgets");
-        System.out.println("6: View Employee Tax Records");
+        // System.out.println("6: View Employee Tax Records");
         System.out.println("7: View Tax Breakdown by Payment");
         System.out.println("8: Generate W2 Summary");
         System.out.println("9: Generate 1099 Summary");
@@ -54,7 +54,7 @@ public class FinanceManager implements Actor {
             case 3 -> historyService.viewWrestlerPaymentHistory();
             case 4 -> historyService.viewWorkerPaymentHistory();
             case 5 -> viewPaymentBudgets();
-            case 6 -> viewEmployeeTaxRecords();
+            // case 6 -> viewEmployeeTaxRecords();
             case 7 -> viewTaxBreakdownByPayment();
             case 8 -> generateW2Summary();
             case 9 -> generate1099Summary();

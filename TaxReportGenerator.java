@@ -30,7 +30,7 @@ public class TaxReportGenerator {
             employeeName = worker.getName();
             employeeType = " (Worker)";
         } else {
-            Wrestler wrestler = DataCache.getById(record.getEmployeeId(), Wrestler::new);
+            Wrestler wrestler = DataCache.getById(record.getWrestlerId(), Wrestler::new);
             if (wrestler != null) {
                 employeeName = wrestler.getName();
                 employeeType = " (Wrestler)";
