@@ -1,4 +1,6 @@
 import java.util.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class RehearsalValidator {
     private static final double CREW_HOURLY_RATE = 50.0;
@@ -107,12 +109,15 @@ public class RehearsalValidator {
         // check 7: Budget validation
         Budget rehearsalBudget = Budget.get("Rehearsal");
         if (rehearsalBudget != null) {
-            double estimatedCost = calcualteRehearsalCost(venue, duration);
-            if (rehearsalBudget.funds() < estimatedCost) {
-                result.addError("Rehearsal budget is insufficient. Required: $" +
-                               String.format("%.2f", estimatedCost) +
+            double estimatedCost = calculateRehearsalCost(venue, duration);
+            int costToCharge = (int) Math.ceil(estimatedCost);
+            if (rehearsalBudget.funds() < costToCharge) {
+                result.addError("Rehearsal budget is insufficient. Required: $" + costToCharge +
+                               " (estimated: $" + String.format("%.2f", estimatedCost) + ")" +
                                ", Available: $" + rehearsalBudget.funds());
             }
+        } else {
+            result.addError("Rehearsal budget does not exist. Please create a rehearsal budget first.");
         }
 
         // check 8
@@ -129,10 +134,10 @@ public class RehearsalValidator {
     }
 
     private static boolean hasScheduleConflict(int wrestlerId, long rehearsalDate, int duration) {
-        ArrayList<RehearsalSession> allRehearsals = DataCache.getAll(RehearsalSession::new);
-
         long rehearsalEnd = rehearsalDate + (duration * 60 * 1000L);
 
+        // Check conflicts with other rehearsals
+        ArrayList<RehearsalSession> allRehearsals = DataCache.getAll(RehearsalSession::new);
         for (RehearsalSession existing : allRehearsals) {
             if (existing.getStatus() == RehearsalStatus.CANCELED) {
                 continue;
@@ -151,14 +156,41 @@ public class RehearsalValidator {
                 return true;
             }
         }
+
+        // Check conflicts with events
+        ArrayList<WrestlerSchedule> allSchedules = DataCache.getAll(WrestlerSchedule::new);
+        for (WrestlerSchedule schedule : allSchedules) {
+            if (schedule.getWrestlerId() != wrestlerId) {
+                continue;
+            }
+
+            if (schedule.isEvent() && schedule.getEventId() != -1) {
+                Event event = DataCache.getById(schedule.getEventId(), Event::new);
+                if (event != null) {
+                    try {
+                        SimpleDateFormat eventDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                        Date eventDate = eventDateFormat.parse(event.getDate());
+                        long eventStart = eventDate.getTime();
+                        long eventEnd = eventStart + (240 * 60 * 1000L); // assuming 4 hour event
+                        
+                        if (!(rehearsalEnd <= eventStart || rehearsalDate >= eventEnd)) {
+                            return true;
+                        }
+                    } catch (Exception e) {
+                        continue;
+                    }
+                }
+            }
+        }
+
         return false;
     }
 
-    public static double calcualteRehearsalCost(Venue venue, int duration) {
+    public static double calculateRehearsalCost(Venue venue, int duration) {
         double hours = duration / 60.0;
         double crewCost = MIN_CREW_COUNT * CREW_HOURLY_RATE * hours;
 
-        // simple cost caclulation. use base hourly cost of venue
+        // simple cost calculation. use base hourly cost of venue
         double venueHourlyRate = 100.0; // default
         double venueCost = venueHourlyRate * hours;
 
