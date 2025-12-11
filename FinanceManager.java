@@ -49,16 +49,16 @@ public class FinanceManager implements Actor {
 
     private void handleMenuChoice(int choice) {
         switch (choice) {
-            case 1 -> payWrestlersForEvent();
-            case 2 -> processWorkerPayroll();
-            case 3 -> historyService.viewWrestlerPaymentHistory();
-            case 4 -> historyService.viewWorkerPaymentHistory();
-            case 5 -> viewPaymentBudgets();
-            case 6 -> viewEmployeeTaxRecords();
-            case 7 -> viewTaxBreakdownByPayment();
-            case 8 -> generateW2Summary();
-            case 9 -> generate1099Summary();
-            case 10 -> viewTaxLiabilitySummary();
+            case 1: payWrestlersForEvent(); break;
+            case 2: processWorkerPayroll(); break;
+            case 3: historyService.viewWrestlerPaymentHistory(); break;
+            case 4: historyService.viewWorkerPaymentHistory(); break;
+            case 5: viewPaymentBudgets(); break;
+            case 6: viewEmployeeTaxRecords(); break;
+            case 7: viewTaxBreakdownByPayment(); break;
+            case 8: generateW2Summary(); break;
+            case 9: generate1099Summary(); break;
+            case 10: viewTaxLiabilitySummary(); break;
         }
     }
 
