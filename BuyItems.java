@@ -11,12 +11,25 @@ public class BuyItems {
         OptionList options = new OptionList();
         options.exitOption = "Exit";
 
+        int noRent = 0;
         for (Event e : events) {
-            options.add("Venue: " + e.getVenue().getName().toUpperCase(), () -> {
-                chooseVenue(e.getVenue());
-            });
+            if (!e.getVenue().getName().equalsIgnoreCase("empty"))
+            {
+                options.add("Event: " + e.getVenue().getLocation() + 
+                "; Venue: " + e.getVenue().getName().toUpperCase(), () -> {
+                    chooseVenue(e.getVenue());
+                    });
+            }
+            else noRent++;
         }
-        options.singleDisplayAndSelect("Choose a Venue to Purchase From");
+
+        if (noRent == events.size())
+        {
+            System.out.println("No venue rented. Unable to sell concessions and merchandise.");
+            return;
+        }
+
+        options.singleDisplayAndSelect("Choose a Venue:");
     }
 
     private static void chooseVenue(Venue v) {
@@ -26,25 +39,25 @@ public class BuyItems {
         List<Merchandise> merchandises = DataCache.getAllByFilter(f -> f.getVenueId() == v.getId(), Merchandise::new);
 
         if (concessions.isEmpty() && merchandises.isEmpty()) {
-            System.out.println("No products available at the moment!");
+            System.out.println("No products at "+ v.getName().toUpperCase() + " available at the moment!");
             System.out.println();
             return;
         }
         for (Concession c : concessions) {
-            int price = (c.getAmount() / c.getUnitPrice());
+            int price = c.getUnitPrice() / v.getSections().size();
             options.add(c.getName().toUpperCase() + ", $" + price, () -> {
                 chooseConQuantity(c.getId(), price, v);
             });
         }
 
         for (Merchandise m : merchandises) {
-            int price = (m.getQuantity() / m.getUnitPrice());
+            int price = m.getUnitPrice() / v.getSections().size();
             options.add(m.getName().toUpperCase() + ", $" + price, () -> {
                 chooseMerchQuantity(m.getId(), price, v);
             });
         }
 
-        options.singleDisplayAndSelect("Items Available for Purchase at " + v.getName().toUpperCase() + ":");
+        options.singleDisplayAndSelect("Choose an Item to Purchase:");
     }
 
     private static void chooseConQuantity(int itemId, int price, Venue venue) {
@@ -103,22 +116,23 @@ public class BuyItems {
         charge(price, quantity, venue);
     }
 
-    private static int calculateTotal(int price, int quantity, Venue v) {
-        City city = StaticDataHandler.getCityByName(v.getLocation());
-        int cityPopulation = city.getPopulation();
-
-        int cost = (int) (Math.log((double) cityPopulation) * price * quantity);
+    private static double calculateTotal(int price, int quantity, Venue v) {
+        StateTaxInfo tax = StateTaxRates.getStateTaxInfo(StaticDataHandler.getCityByName(v.getLocation()));
+        double cost = (Math.max(tax.localRate, tax.stateRate) * price * quantity) + (price * quantity);
         return cost;
     }
 
     private static void charge(int price, int quantity, Venue v)
     {
-        int totalPrice = calculateTotal(price, quantity, v);
+        double totalPrice = calculateTotal(price, quantity, v);
+        StateTaxInfo tax = StateTaxRates.getStateTaxInfo(StaticDataHandler.getCityByName(v.getLocation()));
         System.out.println("Quantity: " + quantity);
         System.out.println("Price per item: $" + price);
+        System.out.println("Tax: " + Math.max(tax.localRate, tax.stateRate));
         System.out.println("------------------------");
-        System.out.println("Order Total: $" + totalPrice);
-        Budget.get("Logistics").profit(totalPrice);
+        System.out.printf("Order Total: $%.2f", totalPrice);
+        System.out.println();
+        Budget.get("Logistics").profit((int)totalPrice);
     }
 
 }
